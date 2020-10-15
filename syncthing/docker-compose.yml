@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  syncthing:
+    image: linuxserver/syncthing
+    container_name: syncthing
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing.service=syncthing"
+      - "traefik.http.routers.syncthing.tls=true"
+      - "traefik.http.routers.syncthing.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  fireflydb:
+    image: linuxserver/mariadb
+    container_name: fireflydb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${FIREFLY_DB_ROOT_PASSWORD}
+      - MYSQL_USER=firefly
+      - MYSQL_PASSWORD=${FIREFLY_DB_PASSWORD}
+      - MYSQL_DATABASE=firefly
+    volumes:
+      - ./config/db:/config
+    restart: unless-stopped
+    networks:
+      - db
+
+  firefly:
+    image: jc5x/firefly-iii:latest
+    container_name: firefly
+    depends_on:
+      - fireflydb
+    environment:
+      - TZ=${TZ}
+      - SITE_OWNER=${FIREFLY_OWNER_EMAIL}
+      - APP_KEY=${FIREFLY_APP_KEY}
+      - DB_CONNECTION=mysql
+      - DB_HOST=fireflydb
+      - DB_PORT=3306
+      - DB_DATABASE=firefly
+      - DB_USERNAME=firefly
+      - DB_PASSWORD=${FIREFLY_DB_PASSWORD}
+      - MAIL_MAILER=mailgun
+      - MAIL_FROM=${FIREFLY_MAIL_FROM}
+      - MAILGUN_DOMAIN=${FIREFLY_MAILGUN_DOMAIN}
+      - MAILGUN_SECRET=${FIREFLY_MAILGUN_SECRET}
+      - MAILGUN_ENDPOINT=${FIREFLY_MAILGUN_ENDPOINT}
+      - MAPBOX_API_KEY=${FIREFLY_MAPBOX_API_KEY}
+      - TRUSTED_PROXIES=**
+      - APP_URL=${FIREFLY_APP_URL}
+    volumes:
+      - ./config/export:/var/www/firefly-iii/storage/export
+      - ./config/upload:/var/www/firefly-iii/storage/upload
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.firefly.service=firefly"
+      - "traefik.http.routers.firefly.tls=true"
+      - "traefik.http.routers.firefly.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.firefly.entrypoints=websecure"
+      - "traefik.http.services.firefly.loadbalancer.server.port=8080"
+    networks:
+      - web_proxy
+      - db
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  db:
+    driver: bridge

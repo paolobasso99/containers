@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  huginn:
+    image: huginn/huginn
+    container_name: huginn
+    environment:
+      - INVITATION_CODE=${HUGINN_INVITATION_CODE}
+      - DOMAIN=${HUGINN_HOST}
+      - EMAIL_FROM_ADDRESS=${HUGINN_EMAIL_FROM_ADDRESS}
+      - SMTP_DOMAIN=${HUGINN_SMTP_DOMAIN}
+      - SMTP_USER_NAME=${HUGINN_SMTP_USER_NAME}
+      - SMTP_PASSWORD=${HUGINN_SMTP_PASSWORD}
+      - SMTP_SERVER=${HUGINN_SMTP_SERVER}
+      - SMTP_PORT=${HUGINN_SMTP_PORT}
+      - SMTP_AUTHENTICATION=${HUGINN_SMTP_AUTHENTICATION}
+      - SMTP_SSL=${HUGINN_SMTP_SSL}
+    volumes:
+      - ./data:/var/lib/mysql
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.huginn.service=huginn"
+      - "traefik.http.routers.huginn.tls=true"
+      - "traefik.http.routers.huginn.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.huginn.entrypoints=websecure"
+      - "traefik.http.services.huginn.loadbalancer.server.port=3000"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

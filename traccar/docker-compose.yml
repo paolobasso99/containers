@@ -1,0 +1,60 @@
+version: "3"
+
+services:
+  traccar_db:
+    image: mysql:8
+    container_name: traccar_db
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${TRACCAR_DB_ROOT_PASSWORD}
+      - MYSQL_USER=traccar
+      - MYSQL_PASSWORD=${TRACCAR_DB_PASSWORD}
+      - MYSQL_DATABASE=traccar
+    volumes:
+      - ./db:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - db
+
+  traccar:
+    image: traccar/traccar
+    container_name: traccar
+    depends_on:
+      - traccar_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./logs:/opt/traccar/logs:rw
+      - ./config/traccar.xml:/opt/traccar/conf/traccar.xml:ro
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      - "traefik.http.routers.traccar-dashboard.service=traccar-dashboard"
+      - "traefik.http.routers.traccar-dashboard.tls=true"
+      - "traefik.http.routers.traccar-dashboard.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.traccar-dashboard.entrypoints=websecure"
+      - "traefik.http.services.traccar-dashboard.loadbalancer.server.port=8082"
+      - "traefik.http.routers.traccar-dashboard.rule=Host(\"traccar.$DOMAIN\")"
+      # 5055
+      - "traefik.http.routers.traccar-5055.service=traccar-5055"
+      - "traefik.http.routers.traccar-5055.tls=true"
+      - "traefik.http.routers.traccar-5055.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.traccar-5055.entrypoints=websecure"
+      - "traefik.http.services.traccar-5055.loadbalancer.server.port=5055"
+      - "traefik.http.routers.traccar-5055.rule=Host(\"traccar-5055.$DOMAIN\")"
+    networks:
+      - db
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  db:
+    driver: bridge

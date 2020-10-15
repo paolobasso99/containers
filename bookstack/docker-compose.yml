@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  bookstack_db:
+    image: linuxserver/mariadb
+    container_name: bookstack_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${BOOKSTACK_DB_ROOT_PASSWORD}
+      - MYSQL_USER=bookstack
+      - MYSQL_PASSWORD=${BOOKSTACK_DB_PASSWORD}
+      - MYSQL_DATABASE=bookstack
+    volumes:
+      - ./db:/config
+    restart: unless-stopped
+    networks:
+      - db
+
+  bookstack:
+    image: linuxserver/bookstack
+    container_name: bookstack
+    depends_on: 
+      - bookstack_db
+    environment:
+      - PUID=${PGID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DB_HOST=bookstack_db
+      - DB_USER=bookstack
+      - DB_PASS=${BOOKSTACK_DB_PASSWORD}
+      - DB_DATABASE=bookstack
+      - APP_URL=${BOOKSTACK_URL}
+    volumes:
+      - ./config:/config
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bookstack.service=bookstack"
+      - "traefik.http.routers.bookstack.tls=true"
+      - "traefik.http.routers.bookstack.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.bookstack.entrypoints=websecure"
+      - "traefik.http.services.bookstack.loadbalancer.server.port=80"
+    networks:
+      - web_proxy
+      - db
+
+networks:
+  db:
+    driver: bridge
+  web_proxy:
+    external:
+      name: web_proxy

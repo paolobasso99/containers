@@ -1,0 +1,80 @@
+version: "3"
+
+services:
+
+  vikunja_db:
+    image: linuxserver/mariadb
+    container_name: vikunja_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${VIKUNJA_ROOT_PASSWORD}
+      - MYSQL_USER=vikunja
+      - MYSQL_PASSWORD=${VIKUNJA_DB_PASSWORD}
+      - MYSQL_DATABASE=vikunja
+    volumes:
+      - ./db:/config
+    restart: unless-stopped
+    networks:
+      - db
+
+  vikunja_api:
+    image: vikunja/api
+    container_name: vikunja_api
+    depends_on:
+      - vikunja_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VIKUNJA_DATABASE_HOST=vikunja_db
+      - VIKUNJA_DATABASE_PASSWORD=${VIKUNJA_DB_PASSWORD}
+      - VIKUNJA_DATABASE_TYPE=mysql
+      - VIKUNJA_DATABASE_USER=vikunja
+      - VIKUNJA_DATABASE_DATABASE=vikunja
+      - VIKUNJA_SERVICE_FRONTENDURL=https://${VIKUNJA_FRONTEND_HOST}
+    volumes:
+      - ./api:/app/vikunja/files
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vikunja-api.service=vikunja-api"
+      - "traefik.http.routers.vikunja-api.rule=Host(`$VIKUNJA_API_HOST`)"
+      - "traefik.http.routers.vikunja-api.tls=true"
+      - "traefik.http.routers.vikunja-api.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.vikunja-api.entrypoints=websecure"
+      - "traefik.http.services.vikunja-api.loadbalancer.server.port=3456"
+    networks:
+      - web_proxy
+      - db
+
+  vikunja_frontend:
+    image: vikunja/frontend
+    container_name: vikunja_frontend
+    depends_on:
+      - vikunja_db
+      - vikunja_api
+    environment:
+      - VIKUNJA_API_URL=https://${VIKUNJA_API_HOST}/api/v1
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vikunja-frontend.service=vikunja-frontend"
+      - "traefik.http.routers.vikunja-frontend.rule=Host(`$VIKUNJA_FRONTEND_HOST`)"
+      - "traefik.http.routers.vikunja-frontend.tls=true"
+      - "traefik.http.routers.vikunja-frontend.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.vikunja-frontend.entrypoints=websecure"
+      - "traefik.http.services.vikunja-frontend.loadbalancer.server.port=80"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  db:
+    driver: bridge

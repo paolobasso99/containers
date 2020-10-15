@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  authelia:
+    image: authelia/authelia
+    container_name: authelia
+    user: "${PUID}:${PGID}"
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(\"$AUTHELIA_HOST\"")"
+      - "traefik.http.routers.authelia.tls=true"
+      - "traefik.http.routers.authelia.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://$AUTHELIA_HOST/"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

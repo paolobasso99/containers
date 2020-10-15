@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+  monicahqdb:
+    image: linuxserver/mariadb
+    container_name: monicahqdb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MONICAHQ_DB_ROOT_PASSWORD}
+      - MYSQL_USER=monicahq
+      - MYSQL_PASSWORD=${MONICAHQ_DB_PASSWORD}
+      - MYSQL_DATABASE=monicahq
+    volumes:
+      - ./config/db:/config
+    restart: unless-stopped
+    networks:
+      - db
+
+  monicahq:
+    image: monicahq/monicahq
+    container_name: monicahq
+    depends_on:
+      - monicahqdb
+    environment:
+      - TZ=${TZ}
+      - APP_KEY=${MONICAHQ_APP_KEY}
+      - DB_CONNECTION=mysql
+      - DB_HOST=monicahqdb
+      - DB_PORT=3306
+      - DB_DATABASE=monicahq
+      - DB_USERNAME=monicahq
+      - DB_PASSWORD=${MONICAHQ_DB_PASSWORD}
+      - MAIL_MAILER=${MONICAHQ_MAIL_MAILER}
+      - MAIL_FROM=${MONICAHQ_MAIL_FROM}
+      - MAIL_HOST=${MONICAHQ_MAIL_HOST}
+      - MAIL_PORT=${MONICAHQ_MAIL_PORT}
+      - MAIL_USERNAME=${MONICAHQ_MAIL_USERNAME}
+      - MAIL_PASSWORD=${MONICAHQ_MAIL_PASSWORD}
+      - MAIL_ENCRYPTION=${MONICAHQ_MAIL_ENCRYPTION}
+      - ENABLE_GEOLOCATION=${MONICAHQ_ENABLE_GEOLOCATION}
+      - LOCATION_IQ_API_KEY=${MONICAHQ_LOCATION_IQ_API_KEY}
+      - ENABLE_WEATHER=${MONICAHQ_ENABLE_WEATHER}
+      - DARKSKY_API_KEY=${MONICAHQ_DARKSKY_API_KEY}
+      - APP_TRUSTED_PROXIES=*
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.monicahq.service=monicahq"
+      - "traefik.http.routers.monicahq.tls=true"
+      - "traefik.http.routers.monicahq.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.monicahq.entrypoints=websecure"
+      - "traefik.http.services.monicahq.loadbalancer.server.port=80"
+    networks:
+      - web_proxy
+      - db
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  db:
+    driver: bridge

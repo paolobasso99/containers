@@ -1,0 +1,141 @@
+# -*- mode: conf -*-
+# vim:ft=cfg
+
+# Config file for Radicale - A simple calendar server
+#
+# Place it into /etc/radicale/config (global)
+# or ~/.config/radicale/config (user)
+#
+# The current values are the default ones
+
+
+[server]
+
+# CalDAV server hostnames separated by a comma
+# IPv4 syntax: address:port
+# IPv6 syntax: [address]:port
+# For example: 0.0.0.0:9999, [::]:9999
+#hosts = 127.0.0.1:5232
+hosts = 0.0.0.0:5232
+
+# Max parallel connections
+#max_connections = 8
+
+# Max size of request body (bytes)
+#max_content_length = 100000000
+
+# Socket timeout (seconds)
+#timeout = 30
+
+# SSL flag, enable HTTPS protocol
+#ssl = False
+
+# SSL certificate path
+#certificate = /etc/ssl/radicale.cert.pem
+
+# SSL private key
+#key = /etc/ssl/radicale.key.pem
+
+# CA certificate for validating clients. This can be used to secure
+# TCP traffic between Radicale and a reverse proxy
+#certificate_authority =
+
+# SSL Protocol used. See python's ssl module for available values
+#protocol = PROTOCOL_TLSv1_2
+
+# Available ciphers. See python's ssl module for available ciphers
+#ciphers =
+
+# Reverse DNS to resolve client address in logs
+#dns_lookup = True
+
+
+[encoding]
+
+# Encoding for responding requests
+#request = utf-8
+
+# Encoding for storing local collections
+#stock = utf-8
+
+
+[auth]
+
+# Authentication method
+# Value: none | htpasswd | remote_user | http_x_remote_user
+type = htpasswd
+
+# Htpasswd filename, use: htpasswd -cbB users <USER> "<PASSWORD>"
+htpasswd_filename = /config/users
+
+# Htpasswd encryption method
+# Value: plain | sha1 | ssha | crypt | bcrypt | md5
+# Only bcrypt can be considered secure.
+# bcrypt and md5 require the passlib library to be installed.
+htpasswd_encryption = bcrypt
+
+# Incorrect authentication delay (seconds)
+#delay = 1
+
+# Message displayed in the client when a password is needed
+#realm = Radicale - Password Required
+
+
+[rights]
+
+# Rights backend
+# Value: none | authenticated | owner_only | owner_write | from_file
+#type = owner_only
+
+# File for rights management from_file
+#file = /etc/radicale/rights
+
+
+[storage]
+
+# Storage backend
+# Value: multifilesystem
+#type = multifilesystem
+
+# Folder for storing local collections, created if not present
+#filesystem_folder = /var/lib/radicale/collections
+filesystem_folder = /data/collections
+
+# Delete sync token that are older (seconds)
+#max_sync_token_age = 2592000
+
+# Command that is run after changes to storage
+# Example: ([ -d .git ] || git init) && git add -A && (git diff --cached --quiet || git commit -m "Changes by "%(user)s)
+#hook =
+
+
+[web]
+
+# Web interface backend
+# Value: none | internal | radicale_infcloud
+# (See also https://github.com/Unrud/RadicaleInfCloud)
+#type = internal
+
+
+[logging]
+
+# Logging configuration file
+# If no config is given, simple information is printed on the standard output
+# For more information about the syntax of the configuration file, see:
+# http://docs.python.org/library/logging.config.html
+#config =
+
+# Set the default logging level to debug
+#debug = False
+
+# Store all environment variables (including those set in the shell)
+#full_environment = False
+
+# Don't include passwords in logs
+#mask_passwords = True
+
+
+[headers]
+
+# Additional HTTP headers
+#Access-Control-Allow-Origin = *

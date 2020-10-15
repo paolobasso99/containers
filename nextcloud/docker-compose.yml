@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  nextcloud_db:
+    image: linuxserver/mariadb
+    container_name: nextcloud_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+    volumes:
+      - ./db:/config
+    restart: unless-stopped
+    networks:
+      - db
+
+  nextcloud:
+    image: linuxserver/nextcloud
+    container_name: nextcloud
+    depends_on: 
+      - nextcloud_db
+    environment:
+      - PUID=33
+      - PGID=33
+      - TZ=${TZ}
+    volumes:
+      - ./nextcloud:/config
+      - ${NEXTCLOUD_DATA_PATH}:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.service=nextcloud"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=443"
+    networks:
+      - web_proxy
+      - db
+
+networks:
+  db:
+    driver: bridge
+  web_proxy:
+    external:
+      name: web_proxy

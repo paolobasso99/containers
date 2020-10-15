@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  radicale:
+    image: tomsquest/docker-radicale
+    container_name: radicale
+    cap_drop: 
+      - ALL
+    cap_add: 
+      - CHOWN
+      - SETUID
+      - SETGID
+      - KILL
+    security_opt: 
+      - "no-new-privileges:true"
+    restart: unless-stopped
+    volumes:
+      - ./config:/config:ro
+      - ./data:/data
+    environment:
+      - TZ=${TZ}
+      - UID=${PUID}
+      - GID=${PGID}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radicale.service=radicale"
+      - "traefik.http.routers.radicale.tls=true"
+      - "traefik.http.routers.radicale.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.radicale.entrypoints=websecure"
+      - "traefik.http.services.radicale.loadbalancer.server.port=5232"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

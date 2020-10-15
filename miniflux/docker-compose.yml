@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  minifluxdb:
+    image: postgres:12
+    user: "${PUID}:${PGID}"
+    container_name: minifluxdb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=${MINIFLUX_DB_PASSWORD}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - db
+
+  miniflux:
+    image: miniflux/miniflux
+    container_name: miniflux
+    depends_on:
+      - minifluxdb
+    environment:
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=${MINIFLUX_USERNAME}
+      - ADMIN_PASSWORD=${MINIFLUX_PASSWORD}
+      - DATABASE_URL=postgres://miniflux:${MINIFLUX_DB_PASSWORD}@minifluxdb/miniflux?sslmode=disable
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.miniflux.service=miniflux"
+      - "traefik.http.routers.miniflux.tls=true"
+      - "traefik.http.routers.miniflux.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.miniflux.entrypoints=websecure"
+      - "traefik.http.services.miniflux.loadbalancer.server.port=8080"
+    networks:
+      - web_proxy
+      - db
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  db:
+    driver: bridge

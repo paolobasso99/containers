@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  # See https://github.com/pirate/ArchiveBox to run
+  archivebox:
+    image: nikisweeting/archivebox:latest
+    container_name: archivebox
+    command: server 0.0.0.0:8000
+    stdin_open: true
+    tty: true
+    environment:
+      - USE_COLOR=True
+      - SHOW_PROGRESS=True
+      - PUBLIC_INDEX=False
+      - PUBLIC_SNAPSHOTS=False
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.archivebox.service=archivebox"
+      - "traefik.http.routers.archivebox.tls=true"
+      - "traefik.http.routers.archivebox.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.archivebox.entrypoints=websecure"
+      - "traefik.http.services.archivebox.loadbalancer.server.port=8000"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

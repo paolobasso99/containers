@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  wireguard-client:
+    privileged: true
+    image: linuxserver/wireguard
+    container_name: wireguard-client
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped

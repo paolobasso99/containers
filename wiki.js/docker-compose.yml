@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  wikijsdb:
+    image: linuxserver/mariadb
+    container_name: wikijsdb
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${WIKIJS_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=wikijs
+      - MYSQL_PASSWORD=${WIKIJS_DB_PASSWORD}
+      - MYSQL_USER=wikijs
+    logging:
+      driver: "none"
+    restart: unless-stopped
+    volumes:
+      - ./db:/config
+
+  wikijs:
+    image: requarks/wiki:2
+    container_name: wikijs
+    depends_on:
+      - wikijsdb
+    environment:
+      - DB_TYPE=mariadb
+      - DB_HOST=wikijsdb
+      - DB_PORT=3306
+      - DB_USER=wikijs
+      - DB_PASS=${WIKIJS_DB_PASSWORD}
+      - DB_NAME=wikijs
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wikijs.service=wikijs"
+      - "traefik.http.routers.wikijs.tls=true"
+      - "traefik.http.routers.wikijs.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.wikijs.entrypoints=websecure"
+      - "traefik.http.services.wikijs.loadbalancer.server.port=3000"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

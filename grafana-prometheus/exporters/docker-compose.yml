@@ -1,0 +1,92 @@
+version: "3"
+
+services:
+  pihole-exporter:
+    image: ekofr/pihole-exporter:latest
+    container_name: pihole-exporter
+    environment: 
+      - PIHOLE_HOSTNAME=${PIHOLE_HOSTNAME}
+      - PIHOLE_PASSWORD=${PIHOLE_PASSWORD}
+      - INTERVAL=${INTERVAL}
+      - PORT=9707
+    restart: unless-stopped
+    networks:
+      - prometheus_network
+      - pihole_network
+
+  sonarr-exporter:
+    image: onedr0p/exportarr:master
+    container_name: sonarr-exporter
+    entrypoint: ["exportarr"]
+    command: ["sonarr"]
+    environment: 
+      - URL=${SONARR_URL}
+      - APIKEY=${SONARR_APIKEY}
+      - ENABLE_EPISODE_QUALITY_METRICS=true
+      - PORT=9707
+    restart: unless-stopped
+    networks:
+      - prometheus_network
+      - mediabox_network
+
+  radarr-exporter:
+    image: onedr0p/exportarr:master
+    container_name: radarr-exporter
+    entrypoint: ["exportarr"]
+    command: ["radarr"]
+    environment: 
+      - URL=${RADARR_URL}
+      - APIKEY=${RADARR_APIKEY}
+      - PORT=9707
+    restart: unless-stopped
+    networks:
+      - prometheus_network
+      - mediabox_network
+      
+#  lidarr-exporter:
+#    image: onedr0p/exportarr:master
+#    container_name: lidarr-exporter
+#    entrypoint: ["exportarr"]
+#    command: ["lidarr"]
+#    environment: 
+#      - URL=${LIDARR_URL}
+#      - APIKEY=${LIDARR_APIKEY}
+#      - PORT=9707
+#    restart: unless-stopped
+#    networks:
+#      - prometheus_network
+#      - mediabox_network
+
+  deluge-exporter:
+    image: tobbez/deluge_exporter:latest
+    container_name: deluge-exporter
+    environment: 
+      - DELUGE_HOST=${DELUGE_HOSTNAME}
+      - PORT=9354
+    volumes:
+      - ${DELUGE_CONFIG_PATH}:/root/.config/deluge/
+    restart: unless-stopped
+    networks:
+      - prometheus_network
+      - mediabox_network
+
+  uptimerobot-exporter:
+    image:  ukwa/uptimerobot-prometheus-exporter 
+    container_name: uptimerobot-exporter
+    environment: 
+      - UPTIMEROBOT_API_KEY=${UPTIMEROBOT_API_KEY}
+    restart: unless-stopped
+    networks:
+      - prometheus_network
+
+networks:
+  prometheus_network:
+    external: 
+      name: ${PROMETHEUS_NETWORK}
+  mediabox_network:
+    external:
+      name: ${MEDIABOX_NETWORK}
+  pihole_network:
+    external:
+      name: ${PIHOLE_NETWORK}
+  
