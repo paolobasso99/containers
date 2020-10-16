@@ -41,6 +41,8 @@ services:
       - unbound
     environment:
       - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
       - ServerIP=${SERVERIP}
       - WEBPASSWORD=${PIHOLE_PASSWORD}
       - DNS1=${INTERNAL_NETWORK_SUBNET}.0.97#53
