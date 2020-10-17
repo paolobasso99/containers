@@ -12,13 +12,14 @@ services:
       - CF_API_KEY=${CLOUDFLARE_API_KEY}
     ports:
       - 80:80
-      - 433:433
+      - 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./acme/acme.json:/acme.json 
-    networks: 
+      - ./acme/acme.json:/acme.json
+    networks:
       - web_proxy
     command:
+      - --serversTransport.insecureSkipVerify=true
       # Global settings
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=false
@@ -32,9 +33,9 @@ services:
       - --api.debug=false
       # Log
       - --log=true
-      - --log.level=DEBUG # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=WARN # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       # Certificate
-#      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
+#      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server
       - --certificatesResolvers.dns-cloudflare.acme.email=${CLOUDFLARE_EMAIL}
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
@@ -46,26 +47,36 @@ services:
       - --providers.docker.swarmMode=false
       - --providers.docker.defaultRule=Host("{{ index .Labels "com.docker.compose.service" }}.$DOMAIN")
       # Metrics
+      - --entryPoints.metrics.address=:5043
       - --metrics=true
       - --metrics.prometheus=true
-      - --metrics.prometheus.entryPoint=websecure
-      # Skip verification of backend certificates, see https://community.containo.us/t/insecureskipverify-explanation/2195/28
-      - --serversTransport.insecureSkipVerify=true
+      - --metrics.prometheus.entryPoint=metrics
+      # Skip verification of backend certificates if needed, see https://community.containo.us/t/insecureskipverify-explanation/2195/28
+#      - --serversTransport.insecureSkipVerify=true
     labels:
       - "traefik.enable=true"
+      # Dashboard
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.promtail-syslog.rule=Host(\"$TRAEFIK_SUBDOMAIN.$DOMAIN\")"
-      # Basic auth
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=$TRAEFIK_USER_PASSWORD"
+      - "traefik.http.routers.traefik.rule=Host(\"$TRAEFIK_SUBDOMAIN.$DOMAIN\")"
       # Redirect http to https
-      - "traefik.http.routers.http-catchall.rule=hostregexp(\"{host:.+}\"")"
+      - "traefik.http.routers.http-catchall.rule=hostregexp(\"{host:.+}\")"
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # Metrics
+      - "traefik.http.routers.traefik-metrics.service=traefik-metrics"
+      - "traefik.http.routers.traefik-metrics.tls=true"
+      - "traefik.http.routers.traefik-metrics.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.traefik-metrics.entrypoints=websecure"
+      - "traefik.http.services.traefik-metrics.loadbalancer.server.port=5043"
+      - "traefik.http.routers.traefik-metrics.rule=Host(\"$TRAEFIK_SUBDOMAIN.$DOMAIN\") && Path(\"/metrics\")"
+      # Basic auth
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-metrics.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=$TRAEFIK_USER_PASSWORD"
 
 networks:
   web_proxy:
