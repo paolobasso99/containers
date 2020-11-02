@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  whoogle:
+    image: benbusby/whoogle-search
+    user: "${PUID}:${PGID}"
+    container_name: whoogle
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WHOOGLE_USER=${WHOOGLE_USER}
+      - WHOOGLE_PASS=${WHOOGLE_PASS}
+      - WHOOGLE_PROXY_USER=${WHOOGLE_PROXY_USER}
+      - WHOOGLE_PROXY_PASS=${WHOOGLE_PROXY_PASS}
+      - WHOOGLE_PROXY_TYPE=${WHOOGLE_PROXY_TYPE}
+      - WHOOGLE_PROXY_LOC=${WHOOGLE_PROXY_LOC}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoogle.service=whoogle"
+      - "traefik.http.routers.whoogle.tls=true"
+      - "traefik.http.routers.whoogle.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.whoogle.entrypoints=websecure"
+      - "traefik.http.services.whoogle.loadbalancer.server.port=5000"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
