@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  traggo:
+    container_name: traggo
+    image: traggo/server:latest
+    restart: unless-stopped
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TRAGGO_DEFAULT_USER_NAME=${TRAGGO_USERNAME}
+      - TRAGGO_DEFAULT_USER_PASS=${TRAGGO_PASSWORD}
+    volumes:
+      - ./data:/opt/traggo/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traggo.service=traggo"
+      - "traefik.http.routers.traggo.tls=true"
+      - "traefik.http.routers.traggo.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.traggo.entrypoints=websecure"
+      - "traefik.http.services.traggo.loadbalancer.server.port=3030"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
