@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  matomo_db:
+    image: linuxserver/mariadb:version-110.4.17mariabionic
+    container_name: matomo_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${MATOMO_DB_ROOT_PASSWORD}
+      - MYSQL_USER=matomo
+      - MYSQL_PASSWORD=${MATOMO_DB_PASSWORD}
+      - MYSQL_DATABASE=matomo
+    volumes:
+      - ./db:/config
+    restart: unless-stopped
+    networks:
+      - db
+
+  matomo:
+    image: matomo
+    container_name: matomo
+    depends_on: 
+      - matomo_db
+    environment:
+      - PUID=${PGID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MATOMO_DATABASE_HOST=matomo_db
+      - MATOMO_DATABASE_DBNAME=matomo
+      - MATOMO_DATABASE_USERNAME=matomo
+      - MATOMO_DATABASE_PASSWORD=${MATOMO_DB_PASSWORD}
+      - MATOMO_DATABASE_ADAPTER=mysql
+    volumes:
+      - ./config:/var/www/html
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.matomo.service=matomo"
+      - "traefik.http.routers.matomo.tls=true"
+      - "traefik.http.routers.matomo.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.matomo.entrypoints=websecure"
+      - "traefik.http.services.matomo.loadbalancer.server.port=80"
+    networks:
+      - web_proxy
+      - db
+
+networks:
+  db:
+    driver: bridge
+  web_proxy:
+    external:
+      name: web_proxy
