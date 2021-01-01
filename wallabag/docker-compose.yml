@@ -2,7 +2,7 @@ version: "3"
 
 services:
   wallabagdb:
-    image: linuxserver/mariadb
+    image: linuxserver/mariadb:version-110.4.17mariabionic
     container_name: wallabagdb
     environment:
       - PUID=${PUID}

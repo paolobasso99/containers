@@ -2,7 +2,7 @@ version: "3"
 
 services:
   bookstack_db:
-    image: linuxserver/mariadb
+    image: linuxserver/mariadb:version-110.4.17mariabionic
     container_name: bookstack_db
     environment:
       - PUID=${PUID}
