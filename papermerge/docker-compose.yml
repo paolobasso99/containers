@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  papermerge:
+    image: linuxserver/papermerge
+    container_name: papermerge
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.papermerge.service=papermerge"
+      - "traefik.http.routers.papermerge.tls=true"
+      - "traefik.http.routers.papermerge.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.papermerge.entrypoints=websecure"
+      - "traefik.http.services.papermerge.loadbalancer.server.port=8384"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
