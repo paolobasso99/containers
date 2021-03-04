@@ -1,8 +1,12 @@
 version: "3"
 
 services:
+  # Clone git@github.com:paulgalow/fileshelter-docker.git
   fileshelter:
-    image: paulgalow/fileshelter
+    image: fileshelter
+    build:
+      context: ./application
+      dockerfile: Dockerfile
     read_only: true
     container_name: fileshelter
     environment:
