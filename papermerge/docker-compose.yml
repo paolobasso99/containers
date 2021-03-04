@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.papermerge.tls=true"
       - "traefik.http.routers.papermerge.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.papermerge.entrypoints=websecure"
-      - "traefik.http.services.papermerge.loadbalancer.server.port=8384"
+      - "traefik.http.services.papermerge.loadbalancer.server.port=8000"
     networks:
       - web_proxy
 
