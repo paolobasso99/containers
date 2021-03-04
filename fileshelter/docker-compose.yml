@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  fileshelter:
+    image: paulgalow/fileshelter
+    read_only: true
+    container_name: fileshelter
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config/fileshelter.conf:/etc/fileshelter.conf:ro
+      - ./data:/var/fileshelter
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fileshelter.service=fileshelter"
+      - "traefik.http.routers.fileshelter.tls=true"
+      - "traefik.http.routers.fileshelter.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.fileshelter.entrypoints=websecure"
+      - "traefik.http.services.fileshelter.loadbalancer.server.port=5091"
+    networks:
+      - web_proxy
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
