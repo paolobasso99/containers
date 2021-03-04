@@ -42,7 +42,6 @@ services:
 
   standardnotes:
     container_name: standardnotes
-    user: "${PUID}:${PGID}"
     depends_on: 
       - standardnotesdb
       - standardnotes-api
@@ -59,7 +58,7 @@ services:
       - "traefik.http.routers.standardnotes.tls=true"
       - "traefik.http.routers.standardnotes.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.standardnotes.entrypoints=websecure"
-      - "traefik.http.services.standardnotes.loadbalancer.server.port=3001"
+      - "traefik.http.services.standardnotes.loadbalancer.server.port=3000"
     networks:
       - web_proxy
 
