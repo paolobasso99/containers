@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   # Clone https://github.com/standardnotes/syncing-server.git
-  standardnotes:
-    container_name: standardnotes
+  standardnotes-api:
+    container_name: standardnotes-api
     user: "${PUID}:${PGID}"
     depends_on: 
       - standardnotesdb
@@ -31,13 +31,36 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.standardnotes-api.service=standardnotes-api"
+      - "traefik.http.routers.standardnotes-api.tls=true"
+      - "traefik.http.routers.standardnotes-api.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.standardnotes-api.entrypoints=websecure"
+      - "traefik.http.services.standardnotes-api.loadbalancer.server.port=3000"
+    networks:
+      - db
+      - web_proxy
+
+  standardnotes:
+    container_name: standardnotes
+    user: "${PUID}:${PGID}"
+    depends_on: 
+      - standardnotesdb
+      - standardnotes-api
+    image: standardnotes/web:stable
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - SF_DEFAULT_SERVER=http://standardnotes-api:3000
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.standardnotes.service=standardnotes"
       - "traefik.http.routers.standardnotes.tls=true"
       - "traefik.http.routers.standardnotes.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.standardnotes.entrypoints=websecure"
-      - "traefik.http.services.standardnotes.loadbalancer.server.port=3000"
+      - "traefik.http.services.standardnotes.loadbalancer.server.port=3001"
     networks:
-      - db
       - web_proxy
 
   standardnotesdb:
