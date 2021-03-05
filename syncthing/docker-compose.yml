@@ -10,7 +10,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ./config:/config
-      - ./data:/data
+      - ./mnt/syncthing:/mnt/syncthing
     ports:
       - 22000:22000
     restart: unless-stopped
@@ -24,6 +24,31 @@ services:
       - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
     networks:
       - web_proxy
+
+  syncthing-webdav:
+    image: dgraziotin/nginx-webdav-nononsense
+    container_name: syncthing-webdav
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBDAV_USERNAME=${SYNCTHING_WEBDAV_USERNAME}
+      - WEBDAV_PASSWORD=${SYNCTHING_WEBDAV_PASSWORD}
+      - SERVER_NAMES=localhost
+    volumes:
+      - ./mnt/syncthing:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing-webdav.service=syncthing-webdav"
+      - "traefik.http.routers.syncthing-webdav.tls=true"
+      - "traefik.http.routers.syncthing-webdav.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.syncthing-webdav.entrypoints=websecure"
+      - "traefik.http.services.syncthing-webdav.loadbalancer.server.port=80"
+      - "traefik.http.routers.syncthing-webdav.rule=Host(\"$SYNCTHING_WEBDAV_HOST\")"
+    networks:
+      - web_proxy
+
 
 networks:
   web_proxy:
