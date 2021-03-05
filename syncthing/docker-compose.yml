@@ -11,6 +11,8 @@ services:
     volumes:
       - ./config:/config
       - ./data:/data
+    ports:
+      - 22000:22000
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
