@@ -13,6 +13,7 @@ services:
     volumes:
       - ./config:/config
       - ./data:/data
+      - ./webdav:/import
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
