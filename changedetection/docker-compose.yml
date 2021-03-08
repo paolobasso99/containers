@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  changedetection:
+    container_name: changedetection
+    image: dgtlmoon/changedetection.io
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /datastore:/datastore
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.changedetection.service=changedetection"
+      - "traefik.http.routers.changedetection.tls=true"
+      - "traefik.http.routers.changedetection.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.changedetection.entrypoints=websecure"
+      - "traefik.http.services.changedetection.loadbalancer.server.port=5000"
+      # Basic auth
+      - "traefik.http.routers.changedetection.middlewares=changedetection-auth"
+      - "traefik.http.middlewares.changedetection-auth.basicauth.users=$CHANGEDETECTION_USER_PASSWORD"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
