@@ -1,0 +1,30 @@
+version: "3.6"
+
+services:
+  mealie:
+    image: hkotel/mealie:latest
+    container_name: mealie
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mealie.service=mealie"
+      - "traefik.http.routers.mealie.tls=true"
+      - "traefik.http.routers.mealie.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.mealie.entrypoints=websecure"
+      - "traefik.http.services.mealie.loadbalancer.server.port=80"
+      # Basic auth
+      - "traefik.http.routers.mealie.middlewares=mealie-auth"
+      - "traefik.http.middlewares.mealie-auth.basicauth.users=$MEALIE_USER_PASSWORD"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

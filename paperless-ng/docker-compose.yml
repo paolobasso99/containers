@@ -1,0 +1,106 @@
+version: "3.7"
+
+services:
+  paperless-ng-redis:
+    image: redis:6.0
+    container_name: paperless-ng-redis
+    restart: unless-stopped
+    networks:
+      - paperless-ng
+
+  paperless-ng-db:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: paperless-ng-db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=paperless
+      - POSTGRES_USER=paperless
+      - POSTGRES_PASSWORD=${PAPERLESS_DB_PASSWORD}
+    networks:
+      - paperless-ng
+
+  paperless-ng-tika:
+    image: apache/tika
+    container_name: paperless-ng-tika
+    restart: unless-stopped
+    networks:
+      - paperless-ng
+
+  paperless-ng-gotenberg:
+    image: thecodingmachine/gotenberg
+    restart: unless-stopped
+    container_name: paperless-ng-gotenberg
+    environment:
+      - DISABLE_GOOGLE_CHROME=1
+    networks:
+      - paperless-ng
+
+  paperless-ng:
+    image: jonaswinkler/paperless-ng:latest
+    container_name: paperless-ng
+    depends_on:
+      - paperless-ng-redis
+      - paperless-ng-db
+    environment:
+      - USERMAP_UID=${PUID}
+      - USERMAP_GID=${PGID}
+      - PAPERLESS_TIME_ZONE=${TZ}
+      - PAPERLESS_SECRET_KEY=${PAPERLESS_SECRET_KEY}
+      - PAPERLESS_OCR_LANGUAGE=${PAPERLESS_OCR_LANGUAGE}
+      - PAPERLESS_REDIS=redis://paperless-ng-redis:6379
+      - PAPERLESS_DBHOST=paperless-ng-db
+      - PAPERLESS_DBPORT=5432
+      - PAPERLESS_DBUSER=paperless
+      - PAPERLESS_DBPASS=${PAPERLESS_DB_PASSWORD}
+      - PAPERLESS_TIKA_ENABLED=1
+      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://paperless-ng-gotenberg:3000
+      - PAPERLESS_TIKA_ENDPOINT=http://paperless-ng-tika:9998
+    volumes:
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless-ng.service=paperless-ng"
+      - "traefik.http.routers.paperless-ng.tls=true"
+      - "traefik.http.routers.paperless-ng.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.paperless-ng.entrypoints=websecure"
+      - "traefik.http.services.paperless-ng.loadbalancer.server.port=8000"
+    networks:
+      - paperless-ng
+      - web_proxy
+
+  paperless-ng-webdav:
+    image: dgraziotin/nginx-webdav-nononsense
+    container_name: paperless-ng-webdav
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBDAV_USERNAME=${PAPERLESS_WEBDAV_USERNAME}
+      - WEBDAV_PASSWORD=${PAPERLESS_WEBDAV_PASSWORD}
+      - SERVER_NAMES=localhost
+    volumes:
+      - ./consume:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless-ng-webdav.service=paperless-ng-webdav"
+      - "traefik.http.routers.paperless-ng-webdav.tls=true"
+      - "traefik.http.routers.paperless-ng-webdav.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.paperless-ng-webdav.entrypoints=websecure"
+      - "traefik.http.services.paperless-ng-webdav.loadbalancer.server.port=80"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  paperless-ng:
+    driver: bridge
