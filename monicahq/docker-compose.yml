@@ -13,16 +13,18 @@ services:
       - MYSQL_PASSWORD=${MONICAHQ_DB_PASSWORD}
       - MYSQL_DATABASE=monicahq
     volumes:
-      - ./config/db:/config
+      - ./db:/config
     restart: unless-stopped
     networks:
       - db
 
   monicahq:
-    image: monicahq/monicahq
+    image: monica:fpm
     container_name: monicahq
     depends_on:
       - monicahqdb
+    volumes:
+      - ./storage:/var/www/html/storage
     environment:
       - TZ=${TZ}
       - APP_KEY=${MONICAHQ_APP_KEY}
@@ -33,7 +35,7 @@ services:
       - DB_USERNAME=monicahq
       - DB_PASSWORD=${MONICAHQ_DB_PASSWORD}
       - MAIL_MAILER=${MONICAHQ_MAIL_MAILER}
-      - MAIL_FROM=${MONICAHQ_MAIL_FROM}
+      - MAIL_FROM_ADDRESS=${MONICAHQ_MAIL_FROM}
       - MAIL_HOST=${MONICAHQ_MAIL_HOST}
       - MAIL_PORT=${MONICAHQ_MAIL_PORT}
       - MAIL_USERNAME=${MONICAHQ_MAIL_USERNAME}
@@ -51,7 +53,7 @@ services:
       - "traefik.http.routers.monicahq.tls=true"
       - "traefik.http.routers.monicahq.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.monicahq.entrypoints=websecure"
-      - "traefik.http.services.monicahq.loadbalancer.server.port=80"
+      - "traefik.http.services.monicahq.loadbalancer.server.port=9000"
     networks:
       - web_proxy
       - db
