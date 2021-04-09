@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  searx:
+    image: searx/searx:latest
+    container_name: searx
+    command: -f
+    environment:
+      - BIND_ADDRESS=0.0.0.0:8080
+      - BASE_URL=https://${SEARX_HOSTNAME:-localhost}/
+    volumes:
+      - ./config:/etc/searx:rw
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.searx.service=searx"
+      - "traefik.http.routers.searx.tls=true"
+      - "traefik.http.routers.searx.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.searx.entrypoints=websecure"
+      - "traefik.http.services.searx.loadbalancer.server.port=8080"
+      # Basic auth
+      - "traefik.http.routers.searx.middlewares=searx-auth"
+      - "traefik.http.middlewares.searx-auth.basicauth.users=$SEARX_USER_PASSWORD"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
