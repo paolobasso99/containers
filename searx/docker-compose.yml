@@ -33,30 +33,6 @@ services:
     networks:
       - web_proxy
 
-  morty:
-    container_name: morty
-    image: dalf/morty
-    restart: unless-stopped
-    networks:
-      - web_proxy
-    command: -timeout 6 -ipv6 -socks5 ${MORTY_SOCKS5_USERNAME}:${MORTY_SOCKS5_PASSWORD}@${MORTY_SOCKS5_HOST}:${MORTY_SOCKS5_PORT}
-    environment:
-      - MORTY_KEY=${MORTY_KEY}
-      - MORTY_ADDRESS=0.0.0.0:3000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.morty.service=morty"
-      - "traefik.http.routers.morty.tls=true"
-      - "traefik.http.routers.morty.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.morty.entrypoints=websecure"
-      - "traefik.http.services.morty.loadbalancer.server.port=3000"
-      # Basic auth
-      - "traefik.http.routers.morty.middlewares=morty-auth"
-      - "traefik.http.middlewares.morty-auth.basicauth.users=$SEARX_USER_PASSWORD"
-    read_only: true
-    cap_drop:
-      - ALL
-
 networks:
   web_proxy:
     external:
