@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  privoxyvpn:
+    image: binhex/arch-privoxyvpn
+    container_name: privoxyvpn
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - PHP_TZ=${TZ}
+      - UMASK=022
+      - VPN_ENABLED=${VPN_ENABLED}
+      - VPN_USER=${VPN_USER}
+      - VPN_PASS=${VPN_PASS}
+      - VPN_PROV=${VPN_PROV}
+      - VPN_CLIENT=${VPN_CLIENT}
+      - LAN_NETWORK=192.168.1.0/24
+      - NAME_SERVERS=${NAME_SERVERS}
+      - SOCKS_USER=${SOCKS_USER}
+      - SOCKS_PASS=${SOCKS_PASS}
+      - ENABLE_SOCKS=${ENABLE_SOCKS}
+      - ENABLE_PRIVOXY=${ENABLE_PRIVOXY}
+      - DEBUG=${DEBUG}
+    volumes:
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9118:9118
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.privoxyvpn.service=privoxyvpn"
+      - "traefik.http.routers.privoxyvpn.tls=true"
+      - "traefik.http.routers.privoxyvpn.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.privoxyvpn.entrypoints=websecure"
+      - "traefik.http.services.privoxyvpn.loadbalancer.server.port=8118"
+    networks:
+      - web_proxy
+    cap_add: 
+      - NET_ADMIN
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
