@@ -25,6 +25,7 @@ services:
       - ./config:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
+      # Open port of privoxy and/or socks
 #      - 9118:9118
 #      - 8188:8188
     restart: unless-stopped
