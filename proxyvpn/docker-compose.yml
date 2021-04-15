@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  privoxyvpn:
+  proxyvpn:
     image: binhex/arch-privoxyvpn
-    container_name: privoxyvpn
+    container_name: proxyvpn
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -25,21 +25,8 @@ services:
       - ./config:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - 9118:9118
+#      - 9118:9118
+#      - 8188:8188
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.privoxyvpn.service=privoxyvpn"
-      - "traefik.http.routers.privoxyvpn.tls=true"
-      - "traefik.http.routers.privoxyvpn.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.privoxyvpn.entrypoints=websecure"
-      - "traefik.http.services.privoxyvpn.loadbalancer.server.port=8118"
-    networks:
-      - web_proxy
     cap_add: 
       - NET_ADMIN
-
-networks:
-  web_proxy:
-    external:
-      name: web_proxy
