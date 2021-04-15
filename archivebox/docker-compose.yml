@@ -3,7 +3,7 @@ version: "3"
 services:
   # See https://github.com/pirate/ArchiveBox to run
   archivebox:
-    image: nikisweeting/archivebox:latest
+    image: archivebox/archivebox:latest
     container_name: archivebox
     command: server 0.0.0.0:8000
     stdin_open: true
