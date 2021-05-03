@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  ubooquity:
+    image: ghcr.io/linuxserver/ubooquity
+    container_name: ubooquity
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ubooquity.service=ubooquity"
+      - "traefik.http.routers.ubooquity.tls=true"
+      - "traefik.http.routers.ubooquity.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.ubooquity.entrypoints=websecure"
+      - "traefik.http.services.ubooquity.loadbalancer.server.port=3000"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
