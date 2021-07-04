@@ -1,0 +1,51 @@
+version: "3.3"
+services:
+  commento-db:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: commento-db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=commento
+      - POSTGRES_USER=commento
+      - POSTGRES_PASSWORD=${COMMENTO_DB_PASSWORD}
+    networks:
+      - commento
+
+  commento:
+    image: registry.gitlab.com/commento/commento
+    depends_on:
+      - commento-db
+    restart: unless-stopped
+    container_name: commento
+    user: "${PUID}:${PGID}"
+    environment:
+      - COMMENTO_ORIGIN=${COMMENTO_ORIGIN}
+      - COMMENTO_PORT=8080
+      - COMMENTO_POSTGRES=postgres://commento:${COMMENTO_DB_PASSWORD}@commento-db:5432/commento?sslmode=disable
+      # set to false to create the first account
+      - COMMENTO_FORBID_NEW_OWNERS=true
+      - COMMENTO_SMTP_HOST=${COMMENTO_SMTP_HOST}
+      - COMMENTO_SMTP_PORT=${COMMENTO_SMTP_PORT}
+      - COMMENTO_SMTP_USERNAME=${COMMENTO_SMTP_USERNAME}
+      - COMMENTO_SMTP_PASSWORD=${COMMENTO_SMTP_PASSWORD}
+      - COMMENTO_SMTP_FROM_ADDRESS=${COMMENTO_SMTP_FROM_ADDRESS}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.commento.service=commento"
+      - "traefik.http.routers.commento.tls=true"
+      - "traefik.http.routers.commento.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.commento.entrypoints=websecure"
+      - "traefik.http.services.commento.loadbalancer.server.port=8080"
+    networks:
+      - commento
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  commento:
+    driver: bridge
