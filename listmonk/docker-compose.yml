@@ -1,0 +1,45 @@
+# For installation use: docker-compose run --rm listmonk ./listmonk --install
+
+version: "3.3"
+
+services:
+  listmonk-db:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: listmonk-db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=listmonk
+      - POSTGRES_USER=listmonk
+      - POSTGRES_PASSWORD=${LISTMONK_DB_PASSWORD}
+    networks:
+      - listmonk
+
+  listmonk:
+    image: listmonk/listmonk:latest
+    depends_on:
+      - listmonk-db
+    restart: unless-stopped
+    container_name: listmonk
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./config.toml:/listmonk/config.toml
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.listmonk.service=listmonk"
+      - "traefik.http.routers.listmonk.tls=true"
+      - "traefik.http.routers.listmonk.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.listmonk.entrypoints=websecure"
+      - "traefik.http.services.listmonk.loadbalancer.server.port=9000"
+    networks:
+      - listmonk
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  listmonk:
+    driver: bridge
