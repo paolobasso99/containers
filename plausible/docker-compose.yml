@@ -1,0 +1,73 @@
+version: "3.3"
+services:
+  plausible-db:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: plausible-db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=plausible
+      - POSTGRES_USER=plausible
+      - POSTGRES_PASSWORD=${PLAUSIBLE_DB_PASSWORD}
+    networks:
+      - plausible
+
+  plausible-clickhouse:
+    image: yandex/clickhouse-server:21.3.2.5
+    restart: unless-stopped
+    container_name: plausible-clickhouse
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./clickhouse:/var/lib/clickhouse
+      - ./config/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
+      - ./config/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - plausible
+
+  plausible:
+    image: plausible/analytics:latest
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+    depends_on:
+      - plausible-db
+      - plausible-clickhouse
+    restart: unless-stopped
+    container_name: plausible
+    user: "${PUID}:${PGID}"
+    environment:
+      - BASE_URL=${PLAUSIBLE_BASE_URL}
+      - SECRET_KEY_BASE=${PLAUSIBLE_SECRET_KEY_BASE}
+      - DISABLE_REGISTRATION=${PLAUSIBLE_DISABLE_REGISTRATION}
+      - CLICKHOUSE_DATABASE_URL=http://plausible-clickhouse:8123/plausible-clickhouse
+      - DATABASE_URL=postgres://plausible:${PLAUSIBLE_DB_PASSWORD}@plausible-db:5432/plausible
+      - ADMIN_USER_EMAIL=${PLAUSIBLE_ADMIN_USER_EMAIL}
+      - ADMIN_USER_NAME=${PLAUSIBLE_ADMIN_USER_NAME}
+      - ADMIN_USER_PWD=${PLAUSIBLE_ADMIN_USER_PWD}
+      - MAILER_EMAIL=${PLAUSIBLE_MAILER_EMAIL}
+      - SMTP_HOST_ADDR=${PLAUSIBLE_SMTP_HOST_ADDR}
+      - SMTP_HOST_PORT=${PLAUSIBLE_SMTP_HOST_PORT}
+      - SMTP_USER_NAME=${PLAUSIBLE_SMTP_USER_NAME}
+      - SMTP_USER_PWD=${PLAUSIBLE_SMTP_USER_PWD}
+      - SMTP_HOST_SSL_ENABLED=${PLAUSIBLE_SMTP_HOST_SSL_ENABLED}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.plausible.service=plausible"
+      - "traefik.http.routers.plausible.tls=true"
+      - "traefik.http.routers.plausible.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.plausible.entrypoints=websecure"
+      - "traefik.http.services.plausible.loadbalancer.server.port=8000"
+    networks:
+      - plausible
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  plausible:
+    driver: bridge
