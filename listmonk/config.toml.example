@@ -9,7 +9,7 @@ address = "0.0.0.0:9000"
 # be replaced with a better multi-user, role-based authentication system.
 # IMPORTANT: Leave both values empty to disable authentication on admin
 # only where an external authentication is already setup.
-admin_username = "username"
+admin_username = ""
 admin_password = ""
 
 # Database.

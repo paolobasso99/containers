@@ -37,14 +37,6 @@ services:
     volumes:
       - ./api:/app/vikunja/files
     restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.vikunja-api.service=vikunja-api"
-      - "traefik.http.routers.vikunja-api.rule=Host(`$VIKUNJA_API_HOST`)"
-      - "traefik.http.routers.vikunja-api.tls=true"
-      - "traefik.http.routers.vikunja-api.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.vikunja-api.entrypoints=websecure"
-      - "traefik.http.services.vikunja-api.loadbalancer.server.port=3456"
     networks:
       - web_proxy
       - db
@@ -56,7 +48,7 @@ services:
       - vikunja_db
       - vikunja_api
     environment:
-      - VIKUNJA_API_URL=https://${VIKUNJA_API_HOST}/api/v1
+      - VIKUNJA_API_URL=http://vikunja_api:3456/api/v1
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
@@ -69,6 +61,7 @@ services:
       - "traefik.http.routers.vikunja-frontend.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.vikunja-frontend.entrypoints=websecure"
       - "traefik.http.services.vikunja-frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.vikunja-frontend.middlewares=authelia@docker"
     networks:
       - web_proxy
 

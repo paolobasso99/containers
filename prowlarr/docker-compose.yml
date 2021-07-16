@@ -18,6 +18,7 @@ services:
       - "traefik.http.routers.prowlarr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.prowlarr.entrypoints=websecure"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+      - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
     networks:
       - web_proxy
 

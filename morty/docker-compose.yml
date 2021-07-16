@@ -18,9 +18,7 @@ services:
       - "traefik.http.routers.morty.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.morty.entrypoints=websecure"
       - "traefik.http.services.morty.loadbalancer.server.port=3000"
-      # Basic auth
-      - "traefik.http.routers.morty.middlewares=morty-auth"
-      - "traefik.http.middlewares.morty-auth.basicauth.users=$MORTY_USER_PASSWORD"
+      - "traefik.http.routers.morty.middlewares=authelia@docker"
     read_only: true
     cap_drop:
       - ALL

@@ -22,6 +22,7 @@ services:
       - "traefik.http.routers.filebrowser.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.filebrowser.entrypoints=websecure"
       - "traefik.http.services.filebrowser.loadbalancer.server.port=8080"
+      - "traefik.http.routers.filebrowser.middlewares=authelia@docker"
     networks:
       - web_proxy
 

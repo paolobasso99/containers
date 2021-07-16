@@ -15,6 +15,7 @@ services:
       - "traefik.http.routers.portainer.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.middlewares=authelia@docker"
     networks:
       - web_proxy
 

@@ -20,6 +20,7 @@ services:
       - "traefik.http.routers.traggo.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.traggo.entrypoints=websecure"
       - "traefik.http.services.traggo.loadbalancer.server.port=3030"
+      - "traefik.http.routers.traggo.middlewares=authelia@docker"
     networks:
       - web_proxy
 

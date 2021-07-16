@@ -25,6 +25,7 @@ services:
       - "traefik.http.routers.huginn.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.huginn.entrypoints=websecure"
       - "traefik.http.services.huginn.loadbalancer.server.port=3000"
+      - "traefik.http.routers.huginn.middlewares=authelia@docker"
     networks:
       - web_proxy
 

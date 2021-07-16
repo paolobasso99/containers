@@ -38,6 +38,7 @@ services:
       - "traefik.http.routers.projectsend.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.projectsend.entrypoints=websecure"
       - "traefik.http.services.projectsend.loadbalancer.server.port=80"
+      - "traefik.http.routers.projectsend.middlewares=authelia@docker"
     networks:
       - db
       - web_proxy

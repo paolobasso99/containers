@@ -51,6 +51,7 @@ services:
       - "traefik.http.routers.photoprism.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.photoprism.entrypoints=websecure"
       - "traefik.http.services.photoprism.loadbalancer.server.port=2342"
+      - "traefik.http.routers.photoprism.middlewares=authelia@docker"
     networks:
       - web_proxy
       - db

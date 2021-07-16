@@ -20,9 +20,7 @@ services:
       - "traefik.http.routers.searx.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.searx.entrypoints=websecure"
       - "traefik.http.services.searx.loadbalancer.server.port=8080"
-      # Basic auth
-      - "traefik.http.routers.searx.middlewares=searx-auth"
-      - "traefik.http.middlewares.searx-auth.basicauth.users=$SEARX_USER_PASSWORD"
+      - "traefik.http.routers.searx.middlewares=authelia@docker"
     cap_drop:
       - ALL
     cap_add:

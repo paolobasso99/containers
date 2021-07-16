@@ -59,6 +59,7 @@ services:
       - "traefik.http.routers.standardnotes.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.standardnotes.entrypoints=websecure"
       - "traefik.http.services.standardnotes.loadbalancer.server.port=3000"
+      - "traefik.http.routers.standardnotes.middlewares=authelia@docker"
     networks:
       - web_proxy
 

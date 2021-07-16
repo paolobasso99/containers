@@ -11,6 +11,9 @@ services:
     volumes:
       - ./data:/app/data
     restart: unless-stopped
+    environment: 
+      - DEFAULT_EMAIL=${MEALIE_DEFAULT_EMAIL}
+      - BASE_URL=${MEALIE_BASE_URL}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.mealie.service=mealie"
@@ -18,9 +21,7 @@ services:
       - "traefik.http.routers.mealie.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.mealie.entrypoints=websecure"
       - "traefik.http.services.mealie.loadbalancer.server.port=80"
-      # Basic auth
-      - "traefik.http.routers.mealie.middlewares=mealie-auth"
-      - "traefik.http.middlewares.mealie-auth.basicauth.users=$MEALIE_USER_PASSWORD"
+      - "traefik.http.routers.mealie.middlewares=authelia@docker"
     networks:
       - web_proxy
 

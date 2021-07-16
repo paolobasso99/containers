@@ -41,6 +41,7 @@ services:
       - "traefik.http.routers.traccar-dashboard.entrypoints=websecure"
       - "traefik.http.services.traccar-dashboard.loadbalancer.server.port=8082"
       - "traefik.http.routers.traccar-dashboard.rule=Host(\"traccar.$DOMAIN\")"
+      - "traefik.http.routers.traccar-dashboard.middlewares=authelia@docker"
       # 5055
       - "traefik.http.routers.traccar-5055.service=traccar-5055"
       - "traefik.http.routers.traccar-5055.tls=true"

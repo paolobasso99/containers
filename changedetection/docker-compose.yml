@@ -18,9 +18,7 @@ services:
       - "traefik.http.routers.changedetection.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.changedetection.entrypoints=websecure"
       - "traefik.http.services.changedetection.loadbalancer.server.port=5000"
-      # Basic auth
-      - "traefik.http.routers.changedetection.middlewares=changedetection-auth"
-      - "traefik.http.middlewares.changedetection-auth.basicauth.users=$CHANGEDETECTION_USER_PASSWORD"
+      - "traefik.http.routers.changedetection.middlewares=authelia@docker"
     networks:
       - web_proxy
 

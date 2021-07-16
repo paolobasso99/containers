@@ -44,7 +44,6 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - ServerIP=${SERVERIP}
-      - WEBPASSWORD=${PIHOLE_PASSWORD}
       - DNS1=${INTERNAL_NETWORK_SUBNET}.0.97#53
       - DNS2=${INTERNAL_NETWORK_SUBNET}.0.97#53
     volumes:
@@ -60,6 +59,7 @@ services:
       - "traefik.http.routers.pihole.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.pihole.entrypoints=websecure"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
+      - "traefik.http.routers.pihole.middlewares=authelia@docker"
     networks:
       web_proxy:
       wireguard-pihole:

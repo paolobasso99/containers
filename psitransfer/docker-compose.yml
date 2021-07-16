@@ -20,6 +20,7 @@ services:
       - "traefik.http.routers.psitransfer.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.psitransfer.entrypoints=websecure"
       - "traefik.http.services.psitransfer.loadbalancer.server.port=3000"
+      - "traefik.http.routers.psitransfer.middlewares=authelia@docker"
     networks:
       - web_proxy
 

@@ -23,6 +23,7 @@ services:
       - "traefik.http.routers.archivebox.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.archivebox.entrypoints=websecure"
       - "traefik.http.services.archivebox.loadbalancer.server.port=8000"
+      - "traefik.http.routers.archivebox.middlewares=authelia@docker"
     networks:
       - web_proxy
 

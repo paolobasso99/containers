@@ -38,6 +38,7 @@ services:
       - "traefik.http.routers.wikijs.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.wikijs.entrypoints=websecure"
       - "traefik.http.services.wikijs.loadbalancer.server.port=3000"
+      - "traefik.http.routers.wikijs.middlewares=authelia@docker"
     networks:
       - web_proxy
 

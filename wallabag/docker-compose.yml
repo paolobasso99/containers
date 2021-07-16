@@ -52,6 +52,7 @@ services:
       - "traefik.http.routers.wallabag.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.wallabag.entrypoints=websecure"
       - "traefik.http.services.wallabag.loadbalancer.server.port=80"
+      - "traefik.http.routers.wallabag.middlewares=authelia@docker"
     networks:
       - web_proxy
       - db

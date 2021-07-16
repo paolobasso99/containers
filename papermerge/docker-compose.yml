@@ -22,6 +22,7 @@ services:
       - "traefik.http.routers.papermerge.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.papermerge.entrypoints=websecure"
       - "traefik.http.services.papermerge.loadbalancer.server.port=8000"
+      - "traefik.http.routers.papermerge.middlewares=authelia@docker"
     networks:
       - web_proxy
 

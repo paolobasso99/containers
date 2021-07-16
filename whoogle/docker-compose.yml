@@ -23,6 +23,7 @@ services:
       - "traefik.http.routers.whoogle.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.whoogle.entrypoints=websecure"
       - "traefik.http.services.whoogle.loadbalancer.server.port=5000"
+      - "traefik.http.routers.whoogle.middlewares=authelia@docker"
     networks:
       - web_proxy
 

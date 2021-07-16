@@ -36,6 +36,7 @@ services:
       - "traefik.http.routers.miniflux.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.miniflux.entrypoints=websecure"
       - "traefik.http.services.miniflux.loadbalancer.server.port=8080"
+      - "traefik.http.routers.miniflux.middlewares=authelia@docker"
     networks:
       - web_proxy
       - db

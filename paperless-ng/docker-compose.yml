@@ -71,6 +71,7 @@ services:
       - "traefik.http.routers.paperless-ng.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.paperless-ng.entrypoints=websecure"
       - "traefik.http.services.paperless-ng.loadbalancer.server.port=8000"
+      - "traefik.http.routers.paperless-ng.middlewares=authelia@docker"
     networks:
       - paperless-ng
       - web_proxy

@@ -73,10 +73,9 @@ services:
       - "traefik.http.routers.traefik-metrics.entrypoints=websecure"
       - "traefik.http.services.traefik-metrics.loadbalancer.server.port=5043"
       - "traefik.http.routers.traefik-metrics.rule=Host(\"$TRAEFIK_SUBDOMAIN.$DOMAIN\") && Path(\"/metrics\")"
-      # Basic auth
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-      - "traefik.http.routers.traefik-metrics.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=$TRAEFIK_USER_PASSWORD"
+      # Authelia
+      - "traefik.http.routers.traefik.middlewares=authelia@docker"
+      - "traefik.http.routers.traefik-metrics.middlewares=authelia-basic@docker"
 
 networks:
   web_proxy:
