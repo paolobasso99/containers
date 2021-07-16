@@ -1,8 +1,32 @@
 version: "3"
 
 services:
+  authelia_redis:
+    image: redis:6.0
+    container_name: authelia_redis
+    restart: unless-stopped
+    networks:
+      - authelia
+
+  authelia_db:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: authelia_db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=authelia
+      - POSTGRES_USER=authelia
+      - POSTGRES_PASSWORD=${AUTHELIA_DB_PASSWORD}
+    networks:
+      - authelia
+
   authelia:
     image: authelia/authelia
+    depends_on: 
+      - authelia_redis
+      - authelia_db
     container_name: authelia
     user: "${PUID}:${PGID}"
     restart: unless-stopped
@@ -12,19 +36,31 @@ services:
       - TZ=${TZ}
       - PUID=${PUID}
       - PGID=${PGID}
+      - AUTHELIA_JWT_SECRET_FILE=/config/secrets/authelia_jwt_secret
+      - AUTHELIA_SESSION_SECRET_FILE=/config/secrets/authelia_session_secret
+      - AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE=/config/secrets/authelia_storage_postgres_password
+      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/config/secrets/authelia_notifier_smtp_password
+      - AUTHELIA_DUO_API_SECRET_KEY_FILE=/config/secrets/authelia_duo_api_secret_key
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.authelia.rule=Host(\"$AUTHELIA_HOST\"")"
+      - "traefik.http.routers.authelia.rule=Host(\"$AUTHELIA_HOST\")"
       - "traefik.http.routers.authelia.tls=true"
       - "traefik.http.routers.authelia.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.authelia.entrypoints=websecure"
-      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://$AUTHELIA_HOST/"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=$AUTHELIA_HOST"
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
+      - "traefik.http.middlewares.authelia-basic.forwardauth.address=http://authelia:9091/api/verify?auth=basic"
+      - "traefik.http.middlewares.authelia-basic.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia-basic.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
     networks:
       - web_proxy
+      - authelia
 
 networks:
   web_proxy:
     external:
       name: web_proxy
+  authelia:
+    driver: bridge

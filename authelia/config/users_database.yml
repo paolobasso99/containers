@@ -1,0 +1,7 @@
+users:
+  username:
+    displayname: "Name"
+    password: "HASHED_PASSWORD"
+    email: myemail@domain.com
+    groups:
+      - admins
