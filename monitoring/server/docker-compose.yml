@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION}
+    container_name: grafana
+    user: "${PUID}:${PGID}"
+    environment:
+      - GF_INSTALL_PLUGINS=${GRAFANA_PLUGINS}
+    volumes:
+      - ./grafana:/var/lib/grafana
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(\"$GRAFANA_SUBDOMAIN.$DOMAIN\")"
+      - "traefik.http.routers.grafana.service=grafana"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.grafana.entrypoints=${TRAEFIK_ENTRYPOINTS}"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.http.routers.grafana.middlewares=authelia@docker"
+    networks:
+      - grafana
+      - web_proxy
+
+  loki:
+    image: grafana/loki:${LOKI_VERSION}
+    container_name: loki
+    user: "${PUID}:${PGID}"
+    command: -config.file=/config/loki-config.yml
+    volumes:
+      - ./loki/config:/config:ro
+      - ./loki/data:/loki
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.loki.rule=Host(\"$LOKI_SUBDOMAIN.$DOMAIN\")"
+      - "traefik.http.routers.loki.service=loki"
+      - "traefik.http.routers.loki.tls=true"
+      - "traefik.http.routers.loki.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.loki.entrypoints=${TRAEFIK_ENTRYPOINTS}"
+      - "traefik.http.services.loki.loadbalancer.server.port=3100"
+      - "traefik.http.routers.loki.middlewares=authelia-basic@docker"
+    networks:
+      - grafana
+      - loki
+      - prometheus
+      - web_proxy
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    container_name: prometheus
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./prometheus/config:/etc/prometheus
+      - ./prometheus/data:/prometheus
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(\"$PROMETHEUS_SUBDOMAIN.$DOMAIN\")"
+      - "traefik.http.routers.prometheus.service=prometheus"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.routers.prometheus.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.prometheus.entrypoints=${TRAEFIK_ENTRYPOINTS}"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.middlewares=authelia@docker"
+    networks:
+      - grafana
+      - prometheus
+      - web_proxy
+
+networks:
+  grafana:
+    driver: bridge
+  web_proxy:
+    external:
+      name: web_proxy
+  prometheus:
+    external:
+      name: prometheus
+  loki:
+    external:
+      name: loki

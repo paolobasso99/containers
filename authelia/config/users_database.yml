@@ -12,3 +12,8 @@ users:
     displayname: "Prometheus"
     password: HASHED_PASSWORD
     email: prometheus@domain.com
+
+  promtail-servername:
+    displayname: "Promtail Servername"
+    password: HASHED_PASSWORD
+    email: promtail-servername@domain.com

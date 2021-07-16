@@ -54,6 +54,12 @@ services:
       - "traefik.http.middlewares.authelia-basic.forwardauth.address=http://authelia:9091/api/verify?auth=basic"
       - "traefik.http.middlewares.authelia-basic.forwardauth.trustForwardHeader=true"
       - "traefik.http.middlewares.authelia-basic.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
+      # Authelia headers, see https://www.authelia.com/docs/security/measures.html#traefik-2x---docker-compose
+      - "traefik.http.routers.authelia.middlewares=authelia-headers"
+      - "traefik.http.middlewares.authelia-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.authelia-headers.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.authelia-headers.headers.customResponseHeaders.Cache-Control=no-store"
+      - "traefik.http.middlewares.authelia-headers.headers.customResponseHeaders.Pragma=no-cache"
     networks:
       - web_proxy
       - authelia

@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  promtail:
+    image: grafana/promtail:1.6.1
+    container_name: promtail
+    command: -config.file=/config/promtail-config.yml
+    volumes:
+      - ./promtail/config:/config:ro
+      - ./promtail/data:/promtail
+      - /var/log:/var/log
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cadvisor.service=cadvisor"
+      - "traefik.http.routers.cadvisor.rule=Host(\"$MONITORING_SUBDOMAIN.$DOMAIN\") && PathPrefix(\"/cadvisor\")"
+      - "traefik.http.routers.cadvisor.tls=true"
+      - "traefik.http.routers.cadvisor.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.cadvisor.entrypoints=${TRAEFIK_ENTRYPOINTS}"
+      - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
+      - "traefik.http.routers.cadvisor.middlewares=cadvisor-stripprefix,authelia-basic@docker"
+      - "traefik.http.middlewares.cadvisor-stripprefix.stripprefix.prefixes=/cadvisor"
+      - "traefik.http.middlewares.cadvisor-stripprefix.stripprefix.forceSlash=false"
+    networks:
+      - web_proxy
+
+  node-exporter:
+    image: bitnami/node-exporter
+    container_name: node-exporter
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.node-exporter.service=node-exporter"
+      - "traefik.http.routers.node-exporter.rule=Host(\"$MONITORING_SUBDOMAIN.$DOMAIN\") && PathPrefix(\"/node-exporter\")"
+      - "traefik.http.routers.node-exporter.tls=true"
+      - "traefik.http.routers.node-exporter.tls.certresolver=${TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.node-exporter.entrypoints=${TRAEFIK_ENTRYPOINTS}"
+      - "traefik.http.services.node-exporter.loadbalancer.server.port=9100"
+      - "traefik.http.routers.node-exporter.middlewares=node-exporter-stripprefix,authelia-basic@docker"
+      - "traefik.http.middlewares.node-exporter-stripprefix.stripprefix.prefixes=/node-exporter"
+      - "traefik.http.middlewares.node-exporter-stripprefix.stripprefix.forceSlash=false"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
