@@ -29,9 +29,19 @@ access_control:
     - domain: authelia.example.com
       policy: bypass
     - domain:
+        - traefik-hc01.bassopaolo.com
+      policy: one_factor
+      resources:
+        # Match url that ends with "/metrics" and "/metrics/"
+        - "^/?.*/metrics/?$"
+      subject:
+        - ["user:prometheus"]
+    - domain:
         - "*.example.com"
         - "example.com"
       policy: two_factor
+      subject:
+        - ["group:admins"]
 
 session:
   name: authelia_session

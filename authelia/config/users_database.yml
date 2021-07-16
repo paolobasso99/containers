@@ -1,7 +1,14 @@
+# Create passwords with: docker run authelia/authelia:latest authelia hash-password YOUR_PASSWORD
+
 users:
-  username:
+  admin_user_name:
     displayname: "Name"
-    password: "HASHED_PASSWORD"
+    password: HASHED_PASSWORD
     email: myemail@domain.com
     groups:
       - admins
+
+  promeheus:
+    displayname: "Prometheus"
+    password: HASHED_PASSWORD
+    email: prometheus@domain.com
