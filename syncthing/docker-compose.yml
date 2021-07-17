@@ -27,15 +27,12 @@ services:
       - web_proxy
 
   syncthing-webdav:
-    image: dgraziotin/nginx-webdav-nononsense
+    image: paolobasso/webdav
     container_name: syncthing-webdav
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBDAV_USERNAME=${SYNCTHING_WEBDAV_USERNAME}
-      - WEBDAV_PASSWORD=${SYNCTHING_WEBDAV_PASSWORD}
-      - SERVER_NAMES=localhost
     volumes:
       - ./mnt/syncthing:/data
     restart: unless-stopped
@@ -47,6 +44,7 @@ services:
       - "traefik.http.routers.syncthing-webdav.entrypoints=websecure"
       - "traefik.http.services.syncthing-webdav.loadbalancer.server.port=80"
       - "traefik.http.routers.syncthing-webdav.rule=Host(\"$SYNCTHING_WEBDAV_HOST\")"
+      - "traefik.http.routers.syncthing-webdav.middlewares=authelia-basic@docker"
     networks:
       - web_proxy
 

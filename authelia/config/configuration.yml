@@ -29,6 +29,7 @@ access_control:
   rules:
     - domain: authelia.bassopaolo.com
       policy: bypass
+
     - domain:
         - traefik-hc01.bassopaolo.com
         - monitoring-hc01.bassopaolo.com
@@ -37,7 +38,16 @@ access_control:
         # Match url that ends with "/metrics" and "/metrics/"
         - "^/?.*/metrics/?$"
       subject:
-        - ["user:prometheus"]
+        - user:prometheus
+
+    - domain:
+        - syncthing-webdav.bassopaolo.com
+        - paperless-ng-webdav.bassopaolo.com
+      policy: one_factor
+      subject:
+        - group:admins
+        - user:webdav
+
     - domain:
         - loki.bassopaolo.com
       policy: one_factor
@@ -45,13 +55,14 @@ access_control:
         # Match url that starts with "/loki/api"
         - "^/loki/api.*$"
       subject:
-        - ["user:promtail-hc01"]
+        - user:promtail-hc01
+
     - domain:
         - "*.bassopaolo.com"
         - "bassopaolo.com"
       policy: two_factor
       subject:
-        - ["group:admins"]
+        - group:admins
 
 session:
   name: authelia_session

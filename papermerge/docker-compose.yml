@@ -27,15 +27,12 @@ services:
       - web_proxy
 
   papermerge-webdav:
-    image: dgraziotin/nginx-webdav-nononsense
+    image: paolobasso/webdav
     container_name: papermerge-webdav
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBDAV_USERNAME=${PAPERMERGE_WEBDAV_USERNAME}
-      - WEBDAV_PASSWORD=${PAPERMERGE_WEBDAV_PASSWORD}
-      - SERVER_NAMES=localhost
     volumes:
       - ./webdav:/data
     restart: unless-stopped
@@ -46,6 +43,7 @@ services:
       - "traefik.http.routers.papermerge-webdav.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.papermerge-webdav.entrypoints=websecure"
       - "traefik.http.services.papermerge-webdav.loadbalancer.server.port=80"
+      - "traefik.http.routers.papermerge-webdav.middlewares=authelia-basic@docker"
     networks:
       - web_proxy
 

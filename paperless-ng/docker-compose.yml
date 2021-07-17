@@ -77,15 +77,12 @@ services:
       - web_proxy
 
   paperless-ng-webdav:
-    image: dgraziotin/nginx-webdav-nononsense
+    image: paolobasso/webdav
     container_name: paperless-ng-webdav
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBDAV_USERNAME=${PAPERLESS_WEBDAV_USERNAME}
-      - WEBDAV_PASSWORD=${PAPERLESS_WEBDAV_PASSWORD}
-      - SERVER_NAMES=localhost
     volumes:
       - ./consume:/data
     restart: unless-stopped
@@ -96,6 +93,7 @@ services:
       - "traefik.http.routers.paperless-ng-webdav.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.paperless-ng-webdav.entrypoints=websecure"
       - "traefik.http.services.paperless-ng-webdav.loadbalancer.server.port=80"
+      - "traefik.http.routers.paperless-ng-webdav.middlewares=authelia-basic@docker"
     networks:
       - web_proxy
 

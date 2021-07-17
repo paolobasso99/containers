@@ -8,6 +8,13 @@ users:
     groups:
       - admins
 
+  webdav:
+    displayname: "WebDAV"
+    password: HASHED_PASSWORD
+    email: webdav-user@domain.com
+    groups:
+      - webdav
+
   promeheus:
     displayname: "Prometheus"
     password: HASHED_PASSWORD
