@@ -39,7 +39,6 @@ services:
       - "traefik.http.routers.commento.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.commento.entrypoints=websecure"
       - "traefik.http.services.commento.loadbalancer.server.port=8080"
-      - "traefik.http.routers.commento.middlewares=authelia@docker"
     networks:
       - commento
       - web_proxy

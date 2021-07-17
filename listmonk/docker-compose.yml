@@ -32,8 +32,6 @@ services:
       - "traefik.http.routers.listmonk.tls=true"
       - "traefik.http.routers.listmonk.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.listmonk.entrypoints=websecure"
-      - "traefik.http.services.listmonk.loadbalancer.server.port=9000"
-      - "traefik.http.routers.listmonk.middlewares=authelia@docker"
     networks:
       - listmonk
       - web_proxy

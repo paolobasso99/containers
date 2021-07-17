@@ -61,7 +61,6 @@ services:
       - "traefik.http.routers.plausible.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.plausible.entrypoints=websecure"
       - "traefik.http.services.plausible.loadbalancer.server.port=8000"
-      - "traefik.http.routers.plausible.middlewares=authelia@docker"
     networks:
       - plausible
       - web_proxy
