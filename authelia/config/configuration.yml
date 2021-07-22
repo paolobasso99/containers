@@ -49,6 +49,13 @@ access_control:
         - user:webdav
 
     - domain:
+        - monicahq.bassopaolo.com
+      policy: bypass
+      resources:
+        # Match url that starts with "/dav"
+        - "^/dav.*$"
+
+    - domain:
         - loki.bassopaolo.com
       policy: one_factor
       resources:

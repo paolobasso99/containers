@@ -52,6 +52,7 @@ services:
       - "traefik.http.routers.firefly.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.firefly.entrypoints=websecure"
       - "traefik.http.services.firefly.loadbalancer.server.port=8080"
+      - "traefik.http.routers.firefly.middlewares=authelia@docker"
     networks:
       - web_proxy
       - db

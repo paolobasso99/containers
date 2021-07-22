@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.fileshelter.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.fileshelter.entrypoints=websecure"
       - "traefik.http.services.fileshelter.loadbalancer.server.port=5091"
-      - "traefik.http.routers.filebrowser.middlewares=authelia@docker"
+      - "traefik.http.routers.fileshelter.middlewares=authelia@docker"
     networks:
       - web_proxy
     cap_drop:

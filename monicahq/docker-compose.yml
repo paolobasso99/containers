@@ -54,6 +54,7 @@ services:
       - "traefik.http.routers.monicahq.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.monicahq.entrypoints=websecure"
       - "traefik.http.services.monicahq.loadbalancer.server.port=9000"
+      - "traefik.http.routers.monicahq.middlewares=authelia@docker"
     networks:
       - web_proxy
       - db
