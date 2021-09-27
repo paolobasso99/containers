@@ -19,7 +19,7 @@ services:
       - db
 
   bookstack:
-    image: linuxserver/bookstack
+    image: ghcr.io/linuxserver/bookstack
     container_name: bookstack
     depends_on: 
       - bookstack_db
@@ -42,7 +42,6 @@ services:
       - "traefik.http.routers.bookstack.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.bookstack.entrypoints=websecure"
       - "traefik.http.services.bookstack.loadbalancer.server.port=80"
-      - "traefik.http.routers.bookstack.middlewares=authelia@docker"
     networks:
       - web_proxy
       - db
