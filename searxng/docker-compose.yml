@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    command: -f
+    environment:
+      - BIND_ADDRESS=0.0.0.0:8080
+      - BASE_URL=https://${SEARXNG_HOSTNAME}/
+      - MORTY_URL=https://${MORTY_HOSTNAME}/
+      - MORTY_KEY=${MORTY_KEY}
+    volumes:
+      - ./config:/etc/searx:rw
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.searxng.service=searxng"
+      - "traefik.http.routers.searxng.tls=true"
+      - "traefik.http.routers.searxng.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.searxng.entrypoints=websecure"
+      - "traefik.http.services.searxng.loadbalancer.server.port=8080"
+      - "traefik.http.routers.searxng.middlewares=authelia@docker"
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
