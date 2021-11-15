@@ -1,0 +1,52 @@
+version: "3.7"
+
+services:
+  joplin_db:
+    image: postgres:13
+    restart: unless-stopped
+    container_name: joplin_db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=joplin
+      - POSTGRES_USER=joplin
+      - POSTGRES_PASSWORD=${JOPLIN_DB_PASSWORD}
+    networks:
+      - joplin
+
+  joplin:
+    image: joplin/server
+    container_name: joplin
+    depends_on:
+      - joplin_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - APP_BASE_URL=${JOPLIN_BASE_URL}
+      - APP_PORT=22300
+      - DB_CLIENT=pg
+      - POSTGRES_PASSWORD=${JOPLIN_DB_PASSWORD}
+      - POSTGRES_DATABASE=joplin
+      - POSTGRES_USER=joplin
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=joplin_db
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.joplin.service=joplin"
+      - "traefik.http.routers.joplin.tls=true"
+      - "traefik.http.routers.joplin.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.joplin.entrypoints=websecure"
+      - "traefik.http.services.joplin.loadbalancer.server.port=22300"
+    networks:
+      - joplin
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  joplin:
+    driver: bridge
