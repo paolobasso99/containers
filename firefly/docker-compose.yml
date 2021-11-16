@@ -19,7 +19,7 @@ services:
       - db
 
   firefly:
-    image: jc5x/firefly-iii:latest
+    image: fireflyiii/core:latest
     container_name: firefly
     depends_on:
       - fireflydb
