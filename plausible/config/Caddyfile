@@ -1,0 +1,9 @@
+:80
+
+@plausible path {$PLAUSIBLE_PROXY_SCRIPT_PATH:/js/script.js} /api/event
+handle @plausible {
+  rewrite {$PLAUSIBLE_PROXY_SCRIPT_PATH:/js/script.js} /js/plausible.js
+  reverse_proxy {$PLAUSIBLE_BASE_URL} {
+    header_up Host {http.reverse_proxy.upstream.hostport}
+  }
+}

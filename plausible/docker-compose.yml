@@ -30,9 +30,37 @@ services:
     networks:
       - plausible
 
+  # Proxy plausible to avoid adblocking and to use authelia, see:
+  # https://plausible.io/docs/proxy/introduction#options-for-dealing-with-missing-data-as-a-site-owner
+  # https://plausible.io/docs/proxy/guides/caddy
+  plausible-proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    container_name: plausible-proxy
+    user: "${PUID}:${PGID}"
+    environment:
+      - PLAUSIBLE_BASE_URL=http://plausible:8000
+      - PLAUSIBLE_PROXY_SCRIPT_PATH=${PLAUSIBLE_PROXY_SCRIPT_PATH}
+    volumes:
+      - ./proxy:/data
+      - ./config/Caddyfile:/etc/caddy/Caddyfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.plausible-proxy.service=plausible-proxy"
+      - "traefik.http.routers.plausible-proxy.rule=Host(\"${PLAUSIBLE_PROXY_BAS\
+        E_URL}\")"
+      - "traefik.http.routers.plausible-proxy.tls=true"
+      - "traefik.http.routers.plausible-proxy.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.plausible-proxy.entrypoints=websecure"
+      - "traefik.http.services.plausible-proxy.loadbalancer.server.port=80"
+    networks:
+      - plausible
+      - web_proxy
+
   plausible:
     image: plausible/analytics:latest
-    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db
+      migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
     depends_on:
       - plausible-db
       - plausible-clickhouse
@@ -61,6 +89,7 @@ services:
       - "traefik.http.routers.plausible.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.plausible.entrypoints=websecure"
       - "traefik.http.services.plausible.loadbalancer.server.port=8000"
+      - "traefik.http.routers.plausible.middlewares=authelia@docker"
     networks:
       - plausible
       - web_proxy
