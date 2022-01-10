@@ -40,7 +40,8 @@ services:
     user: "${PUID}:${PGID}"
     environment:
       - PLAUSIBLE_BASE_URL=http://plausible:8000
-      - PLAUSIBLE_PROXY_SCRIPT_PATH=${PLAUSIBLE_PROXY_SCRIPT_PATH}
+      - PLAUSIBLE_PROXY_SCRIPT_DEST=${PLAUSIBLE_PROXY_SCRIPT_DEST}
+      - PLAUSIBLE_PROXY_SCRIPT_ORIGIN=${PLAUSIBLE_PROXY_SCRIPT_ORIGIN}
     volumes:
       - ./proxy:/data
       - ./config/Caddyfile:/etc/caddy/Caddyfile
