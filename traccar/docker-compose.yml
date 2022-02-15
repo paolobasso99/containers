@@ -2,9 +2,8 @@ version: "3"
 
 services:
   traccar_db:
-    image: mysql:8
+    image: linuxserver/mariadb:10.5.13-alpine
     container_name: traccar_db
-    user: "${PUID}:${PGID}"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
