@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   joplin_db:
-    image: postgres:13
+    image: postgres:14-alpine
     restart: unless-stopped
     container_name: joplin_db
     user: "${PUID}:${PGID}"

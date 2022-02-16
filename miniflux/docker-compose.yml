@@ -2,7 +2,7 @@ version: "3"
 
 services:
   minifluxdb:
-    image: postgres:12
+    image: postgres:14-alpine
     user: "${PUID}:${PGID}"
     container_name: minifluxdb
     environment:
