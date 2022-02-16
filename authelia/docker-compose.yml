@@ -23,7 +23,7 @@ services:
       - authelia
 
   authelia:
-    image: authelia/authelia
+    image: authelia/authelia:4
     depends_on: 
       - authelia_redis
       - authelia_db

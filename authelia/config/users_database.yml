@@ -1,4 +1,4 @@
-# Create passwords with: docker run authelia/authelia:latest authelia hash-password YOUR_PASSWORD
+# Create passwords with: docker run authelia/authelia:4 authelia hash-password YOUR_PASSWORD
 
 users:
   admin_user_name:
