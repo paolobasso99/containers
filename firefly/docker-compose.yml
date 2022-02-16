@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  fireflydb:
+  firefly_db:
     image: linuxserver/mariadb:10.5.13-alpine
-    container_name: fireflydb
+    container_name: firefly_db
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -13,7 +13,7 @@ services:
       - MYSQL_PASSWORD=${FIREFLY_DB_PASSWORD}
       - MYSQL_DATABASE=firefly
     volumes:
-      - ./config/db:/config
+      - ./db:/config
     restart: unless-stopped
     networks:
       - db
@@ -22,13 +22,13 @@ services:
     image: fireflyiii/core:latest
     container_name: firefly
     depends_on:
-      - fireflydb
+      - firefly_db
     environment:
       - TZ=${TZ}
       - SITE_OWNER=${FIREFLY_OWNER_EMAIL}
       - APP_KEY=${FIREFLY_APP_KEY}
       - DB_CONNECTION=mysql
-      - DB_HOST=fireflydb
+      - DB_HOST=firefly_db
       - DB_PORT=3306
       - DB_DATABASE=firefly
       - DB_USERNAME=firefly
@@ -42,8 +42,8 @@ services:
       - TRUSTED_PROXIES=**
       - APP_URL=${FIREFLY_APP_URL}
     volumes:
-      - ./config/export:/var/www/firefly-iii/storage/export
-      - ./config/upload:/var/www/firefly-iii/storage/upload
+      - ./export:/var/www/firefly-iii/storage/export
+      - ./upload:/var/www/firefly-iii/storage/upload
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
