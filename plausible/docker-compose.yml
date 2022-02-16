@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   plausible-db:
-    image: postgres:14-alpine
+    image: postgres:14
     restart: unless-stopped
     container_name: plausible-db
     user: "${PUID}:${PGID}"
