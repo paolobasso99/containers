@@ -18,7 +18,7 @@ services:
     environment:
       - POSTGRES_DB=authelia
       - POSTGRES_USER=authelia
-      - POSTGRES_PASSWORD=${AUTHELIA_DB_PASSWORD}
+      - POSTGRES_PASSWORD=${AUTHELIA_STORAGE_POSTGRES_PASSWORD}
     networks:
       - authelia
 
@@ -36,11 +36,27 @@ services:
       - TZ=${TZ}
       - PUID=${PUID}
       - PGID=${PGID}
-      - AUTHELIA_JWT_SECRET_FILE=/config/secrets/authelia_jwt_secret
-      - AUTHELIA_SESSION_SECRET_FILE=/config/secrets/authelia_session_secret
-      - AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE=/config/secrets/authelia_storage_postgres_password
-      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/config/secrets/authelia_notifier_smtp_password
-      - AUTHELIA_DUO_API_SECRET_KEY_FILE=/config/secrets/authelia_duo_api_secret_key
+      - AUTHELIA_JWT_SECRET=${AUTHELIA_JWT_SECRET}
+      # Session
+      - AUTHELIA_SESSION_DOMAIN=${AUTHELIA_SESSION_DOMAIN}
+      - AUTHELIA_SESSION_SECRET=${AUTHELIA_SESSION_SECRET}
+      # Session: Redis
+      - AUTHELIA_SESSION_REDIS_HOST=authelia_redis
+      - AUTHELIA_SESSION_REDIS_PORT=6379
+      # Database
+      - AUTHELIA_STORAGE_ENCRYPTION_KEY=${AUTHELIA_STORAGE_ENCRYPTION_KEY}
+      - AUTHELIA_STORAGE_POSTGRES_PASSWORD=${AUTHELIA_STORAGE_POSTGRES_PASSWORD}
+      - AUTHELIA_STORAGE_POSTGRES_HOST=authelia_db
+      - AUTHELIA_STORAGE_POSTGRES_PORT=5432
+      - AUTHELIA_STORAGE_POSTGRES_DATABASE=authelia
+      - AUTHELIA_STORAGE_POSTGRES_USERNAME=authelia
+      - AUTHELIA_STORAGE_POSTGRES_SSLMODE=disable
+      # Notifier
+      - AUTHELIA_NOTIFIER_SMTP_USERNAME=${AUTHELIA_NOTIFIER_SMTP_USERNAME}
+      - AUTHELIA_NOTIFIER_SMTP_PASSWORD=${AUTHELIA_NOTIFIER_SMTP_PASSWORD}
+      - AUTHELIA_NOTIFIER_SMTP_SENDER=${AUTHELIA_NOTIFIER_SMTP_SENDER}
+      - AUTHELIA_NOTIFIER_SMTP_PORT=${AUTHELIA_NOTIFIER_SMTP_PORT}
+      - AUTHELIA_NOTIFIER_SMTP_HOST=${AUTHELIA_NOTIFIER_SMTP_HOST}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authelia.rule=Host(\"$AUTHELIA_HOST\")"
