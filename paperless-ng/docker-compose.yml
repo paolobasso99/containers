@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   paperless-ng-redis:
-    image: redis:6.0
+    image: redis:6-alpine
     container_name: paperless-ng-redis
     restart: unless-stopped
     networks:
