@@ -16,7 +16,7 @@ services:
       - joplin
 
   joplin:
-    image: joplin/server
+    image: joplin/server:2-beta
     container_name: joplin
     depends_on:
       - joplin_db

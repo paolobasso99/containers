@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  monicahqdb:
+  monicahq_db:
     image: linuxserver/mariadb:10.5.13-alpine
-    container_name: monicahqdb
+    container_name: monicahq_db
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -19,17 +19,17 @@ services:
       - db
 
   monicahq:
-    image: monica:fpm
+    image: monica:3
     container_name: monicahq
     depends_on:
-      - monicahqdb
+      - monicahq_db
     volumes:
       - ./storage:/var/www/html/storage
     environment:
       - TZ=${TZ}
       - APP_KEY=${MONICAHQ_APP_KEY}
       - DB_CONNECTION=mysql
-      - DB_HOST=monicahqdb
+      - DB_HOST=monicahq_db
       - DB_PORT=3306
       - DB_DATABASE=monicahq
       - DB_USERNAME=monicahq
@@ -53,7 +53,7 @@ services:
       - "traefik.http.routers.monicahq.tls=true"
       - "traefik.http.routers.monicahq.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.monicahq.entrypoints=websecure"
-      - "traefik.http.services.monicahq.loadbalancer.server.port=9000"
+      - "traefik.http.services.monicahq.loadbalancer.server.port=80"
       - "traefik.http.routers.monicahq.middlewares=authelia@docker"
     networks:
       - web_proxy
