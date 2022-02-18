@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  linkace_db:
+    image: linuxserver/mariadb:10.5.13-alpine
+    container_name: linkace_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=linkace
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=linkace
+    volumes:
+      - ./db:/config
+    restart: unless-stopped
+    networks:
+      - linkace
+
+  linkace:
+    image: linkace/linkace:simple
+    container_name: linkace
+    depends_on:
+      - linkace_db
+      - linkace_redis
+    volumes:
+      - ./.env:/app/.env
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkace.service=linkace"
+      - "traefik.http.routers.linkace.tls=true"
+      - "traefik.http.routers.linkace.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.linkace.entrypoints=websecure"
+      - "traefik.http.services.linkace.loadbalancer.server.port=80"
+      - "traefik.http.routers.linkace.middlewares=authelia@docker"
+    networks:
+      - linkace
+      - web_proxy
+
+  linkace_redis:
+    image: redis:6-alpine
+    container_name: linkace_redis
+    restart: unless-stopped
+    networks:
+      - linkace
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  linkace:
+    driver: bridge
