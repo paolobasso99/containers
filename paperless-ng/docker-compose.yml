@@ -22,6 +22,23 @@ services:
     networks:
       - paperless-ng
 
+  paperless-ng-db-dumper:
+    image: paolobasso/postgres_dumper:14
+    restart: unless-stopped
+    depends_on:
+      - paperless-ng-db
+    container_name: paperless-ng-db-dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - POSTGRES_DB=paperless-ng
+      - POSTGRES_HOST=paperless-ng-db
+      - POSTGRES_USER=paperless-ng
+      - POSTGRES_PASSWORD=${PAPERLESS_DB_PASSWORD}
+      - DUMP_HEALTHCHECKS_URL=${PAPERLESS_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - paperless-ng
+
   paperless-ng-tika:
     image: apache/tika
     container_name: paperless-ng-tika

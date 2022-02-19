@@ -14,6 +14,23 @@ services:
     networks:
       - commento
 
+  commento-db-dumper:
+    image: paolobasso/postgres_dumper:14
+    restart: unless-stopped
+    depends_on:
+      - commento-db
+    container_name: commento-db-dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - POSTGRES_DB=commento
+      - POSTGRES_HOST=commento-db
+      - POSTGRES_USER=commento
+      - POSTGRES_PASSWORD=${COMMENTO_DB_PASSWORD}
+      - DUMP_HEALTHCHECKS_URL=${COMMENTO_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - commento
+
   commento:
     image: registry.gitlab.com/commento/commento
     depends_on:

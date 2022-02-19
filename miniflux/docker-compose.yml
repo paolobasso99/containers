@@ -1,10 +1,10 @@
 version: "3"
 
 services:
-  minifluxdb:
+  miniflux_db:
     image: postgres:14
     user: "${PUID}:${PGID}"
-    container_name: minifluxdb
+    container_name: miniflux_db
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -17,17 +17,34 @@ services:
     networks:
       - db
 
+  miniflux_db_dumper:
+    image: paolobasso/postgres_dumper:14
+    restart: unless-stopped
+    depends_on:
+      - miniflux_db
+    container_name: miniflux_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - POSTGRES_DB=miniflux
+      - POSTGRES_HOST=miniflux_db
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=${MINIFLUX_DB_PASSWORD}
+      - DUMP_HEALTHCHECKS_URL=${MINIFLUX_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - db
+
   miniflux:
     image: miniflux/miniflux
     container_name: miniflux
     depends_on:
-      - minifluxdb
+      - miniflux_db
     environment:
       - RUN_MIGRATIONS=1
       - CREATE_ADMIN=1
       - ADMIN_USERNAME=${MINIFLUX_USERNAME}
       - ADMIN_PASSWORD=${MINIFLUX_PASSWORD}
-      - DATABASE_URL=postgres://miniflux:${MINIFLUX_DB_PASSWORD}@minifluxdb/miniflux?sslmode=disable
+      - DATABASE_URL=postgres://miniflux:${MINIFLUX_DB_PASSWORD}@miniflux_db/miniflux?sslmode=disable
     restart: unless-stopped
     labels:
       - "traefik.enable=true"

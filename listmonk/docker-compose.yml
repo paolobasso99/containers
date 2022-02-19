@@ -17,6 +17,23 @@ services:
     networks:
       - listmonk
 
+  listmonk-db-dumper:
+    image: paolobasso/postgres_dumper:14
+    restart: unless-stopped
+    depends_on:
+      - listmonk-db
+    container_name: listmonk-db-dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - POSTGRES_DB=listmonk
+      - POSTGRES_HOST=listmonk-db
+      - POSTGRES_USER=listmonk
+      - POSTGRES_PASSWORD=${LISTMONK_DB_PASSWORD}
+      - DUMP_HEALTHCHECKS_URL=${LISTMONK_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - listmonk
+
   listmonk:
     image: listmonk/listmonk:latest
     depends_on:

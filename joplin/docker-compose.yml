@@ -15,6 +15,23 @@ services:
     networks:
       - joplin
 
+  joplin_db_dumper:
+    image: paolobasso/postgres_dumper:14
+    restart: unless-stopped
+    depends_on:
+      - joplin_db
+    container_name: joplin_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - POSTGRES_DB=joplin
+      - POSTGRES_HOST=joplin_db
+      - POSTGRES_USER=joplin
+      - POSTGRES_PASSWORD=${JOPLIN_DB_PASSWORD}
+      - DUMP_HEALTHCHECKS_URL=${JOPLIN_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - joplin
+
   joplin:
     image: joplin/server:2-beta
     container_name: joplin

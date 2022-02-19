@@ -22,6 +22,23 @@ services:
     networks:
       - authelia
 
+  authelia_db_dumper:
+    image: paolobasso/postgres_dumper:14
+    restart: unless-stopped
+    depends_on:
+      - authelia_db
+    container_name: authelia_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - POSTGRES_DB=authelia
+      - POSTGRES_HOST=authelia_db
+      - POSTGRES_USER=authelia
+      - POSTGRES_PASSWORD=${AUTHELIA_STORAGE_POSTGRES_PASSWORD}
+      - DUMP_HEALTHCHECKS_URL=${AUTHELIA_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - authelia
+
   authelia:
     image: authelia/authelia:4
     depends_on: 
