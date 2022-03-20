@@ -31,6 +31,8 @@ services:
     volumes:
       - ./dumps:/dumps
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - POSTGRES_DB=authelia
       - POSTGRES_HOST=authelia_db
       - POSTGRES_USER=authelia

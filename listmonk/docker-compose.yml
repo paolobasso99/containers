@@ -26,6 +26,8 @@ services:
     volumes:
       - ./dumps:/dumps
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - POSTGRES_DB=listmonk
       - POSTGRES_HOST=listmonk-db
       - POSTGRES_USER=listmonk

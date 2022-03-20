@@ -31,6 +31,8 @@ services:
     volumes:
       - ./dumps:/dumps
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - POSTGRES_DB=paperless-ng
       - POSTGRES_HOST=paperless-ng-db
       - POSTGRES_USER=paperless-ng

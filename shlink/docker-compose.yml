@@ -24,6 +24,8 @@ services:
     volumes:
       - ./dumps:/dumps
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - POSTGRES_DB=shlink
       - POSTGRES_HOST=shlink_db
       - POSTGRES_USER=shlink

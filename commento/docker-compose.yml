@@ -23,6 +23,8 @@ services:
     volumes:
       - ./dumps:/dumps
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - POSTGRES_DB=commento
       - POSTGRES_HOST=commento-db
       - POSTGRES_USER=commento

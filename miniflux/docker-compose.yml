@@ -26,6 +26,8 @@ services:
     volumes:
       - ./dumps:/dumps
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - POSTGRES_DB=miniflux
       - POSTGRES_HOST=miniflux_db
       - POSTGRES_USER=miniflux
