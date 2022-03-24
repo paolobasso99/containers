@@ -18,6 +18,26 @@ services:
     networks:
       - db
 
+  firefly_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - firefly_db
+    container_name: firefly_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=mysql
+      - DUMPER_DATABASE=firefly
+      - DUMPER_HOST=firefly_db
+      - DUMPER_USER=firefly
+      - DUMPER_PASSWORD=${FIREFLY_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${FIREFLY_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - db
+
   firefly:
     image: fireflyiii/core:latest
     container_name: firefly

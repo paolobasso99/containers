@@ -18,6 +18,26 @@ services:
     networks:
       - db
 
+  monicahq_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - monicahq_db
+    container_name: monicahq_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=mysql
+      - DUMPER_DATABASE=monicahq
+      - DUMPER_HOST=monicahq_db
+      - DUMPER_USER=monicahq
+      - DUMPER_PASSWORD=${MONICAHQ_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${MONICAHQ_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - db
+
   monicahq:
     image: monica:3
     container_name: monicahq

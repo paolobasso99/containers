@@ -18,6 +18,26 @@ services:
     networks:
       - db
 
+  bookstack_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - bookstack_db
+    container_name: bookstack_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=mysql
+      - DUMPER_DATABASE=bookstack
+      - DUMPER_HOST=bookstack_db
+      - DUMPER_USER=bookstack
+      - DUMPER_PASSWORD=${BOOKSTACK_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${BOOKSTACK_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - db
+
   bookstack:
     image: ghcr.io/linuxserver/bookstack
     container_name: bookstack

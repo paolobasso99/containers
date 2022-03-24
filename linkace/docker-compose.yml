@@ -18,6 +18,26 @@ services:
     networks:
       - linkace
 
+  linkace_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - linkace_db
+    container_name: linkace_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=mysql
+      - DUMPER_DATABASE=linkace
+      - DUMPER_HOST=linkace_db
+      - DUMPER_USER=linkace
+      - DUMPER_PASSWORD=${DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - db
+
   linkace:
     image: linkace/linkace:simple
     container_name: linkace
