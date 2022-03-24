@@ -34,9 +34,9 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - DUMPER_TYPE=postgres
-      - DUMPER_DATABASE=paperless-ng
+      - DUMPER_DATABASE=paperless
       - DUMPER_HOST=paperless-ng-db
-      - DUMPER_USER=paperless-ng
+      - DUMPER_USER=paperless
       - DUMPER_PASSWORD=${PAPERLESS_DB_PASSWORD}
       - DUMPER_HEALTHCHECKS_URL=${PAPERLESS_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
