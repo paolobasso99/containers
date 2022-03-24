@@ -23,7 +23,7 @@ services:
       - paperless-ng
 
   paperless-ng-db-dumper:
-    image: paolobasso/postgres_dumper:14
+    image: paolobasso/database_dumper:latest
     restart: unless-stopped
     depends_on:
       - paperless-ng-db
@@ -33,11 +33,12 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - POSTGRES_DB=paperless-ng
-      - POSTGRES_HOST=paperless-ng-db
-      - POSTGRES_USER=paperless-ng
-      - POSTGRES_PASSWORD=${PAPERLESS_DB_PASSWORD}
-      - DUMP_HEALTHCHECKS_URL=${PAPERLESS_DB_DUMPER_HEALTHCHECKS_URL}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=paperless-ng
+      - DUMPER_HOST=paperless-ng-db
+      - DUMPER_USER=paperless-ng
+      - DUMPER_PASSWORD=${PAPERLESS_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${PAPERLESS_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
       - paperless-ng
 

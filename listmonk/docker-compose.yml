@@ -18,7 +18,7 @@ services:
       - listmonk
 
   listmonk-db-dumper:
-    image: paolobasso/postgres_dumper:14
+    image: paolobasso/database_dumper:latest
     restart: unless-stopped
     depends_on:
       - listmonk-db
@@ -28,11 +28,12 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - POSTGRES_DB=listmonk
-      - POSTGRES_HOST=listmonk-db
-      - POSTGRES_USER=listmonk
-      - POSTGRES_PASSWORD=${LISTMONK_DB_PASSWORD}
-      - DUMP_HEALTHCHECKS_URL=${LISTMONK_DB_DUMPER_HEALTHCHECKS_URL}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=listmonk
+      - DUMPER_HOST=listmonk-db
+      - DUMPER_USER=listmonk
+      - DUMPER_PASSWORD=${LISTMONK_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${LISTMONK_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
       - listmonk
 

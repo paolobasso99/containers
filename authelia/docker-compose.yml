@@ -23,7 +23,7 @@ services:
       - authelia
 
   authelia_db_dumper:
-    image: paolobasso/postgres_dumper:14
+    image: paolobasso/database_dumper:latest
     restart: unless-stopped
     depends_on:
       - authelia_db
@@ -33,11 +33,12 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - POSTGRES_DB=authelia
-      - POSTGRES_HOST=authelia_db
-      - POSTGRES_USER=authelia
-      - POSTGRES_PASSWORD=${AUTHELIA_STORAGE_POSTGRES_PASSWORD}
-      - DUMP_HEALTHCHECKS_URL=${AUTHELIA_DB_DUMPER_HEALTHCHECKS_URL}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=authelia
+      - DUMPER_HOST=authelia_db
+      - DUMPER_USER=authelia
+      - DUMPER_PASSWORD=${AUTHELIA_STORAGE_POSTGRES_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${AUTHELIA_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
       - authelia
 

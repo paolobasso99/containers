@@ -15,7 +15,7 @@ services:
       - commento
 
   commento-db-dumper:
-    image: paolobasso/postgres_dumper:14
+    image: paolobasso/database_dumper:latest
     restart: unless-stopped
     depends_on:
       - commento-db
@@ -25,11 +25,12 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - POSTGRES_DB=commento
-      - POSTGRES_HOST=commento-db
-      - POSTGRES_USER=commento
-      - POSTGRES_PASSWORD=${COMMENTO_DB_PASSWORD}
-      - DUMP_HEALTHCHECKS_URL=${COMMENTO_DB_DUMPER_HEALTHCHECKS_URL}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=commento
+      - DUMPER_HOST=commento-db
+      - DUMPER_USER=commento
+      - DUMPER_PASSWORD=${COMMENTO_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${COMMENTO_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
       - commento
 
