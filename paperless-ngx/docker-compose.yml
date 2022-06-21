@@ -1,0 +1,133 @@
+version: "3.7"
+
+services:
+  paperless-ngx-redis:
+    image: redis:6-alpine
+    container_name: paperless-ngx-redis
+    restart: unless-stopped
+    networks:
+      - paperless-ngx
+
+  paperless-ngx-db:
+    image: postgres:14
+    restart: unless-stopped
+    container_name: paperless-ngx-db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=paperless
+      - POSTGRES_USER=paperless
+      - POSTGRES_PASSWORD=${PAPERLESS_NGX_DB_PASSWORD}
+    networks:
+      - paperless-ngx
+
+  paperless-ngx-db-dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - paperless-ngx-db
+    container_name: paperless-ngx-db-dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=paperless
+      - DUMPER_HOST=paperless-ngx-db
+      - DUMPER_USER=paperless
+      - DUMPER_PASSWORD=${PAPERLESS_NGX_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${PAPERLESS_NGX_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - paperless-ngx
+
+  paperless-ngx-tika:
+    image: apache/tika
+    container_name: paperless-ngx-tika
+    restart: unless-stopped
+    # no healthcheck because there is not curl/wget
+    networks:
+      - paperless-ngx
+
+  paperless-ngx-gotenberg:
+    image: thecodingmachine/gotenberg
+    restart: unless-stopped
+    container_name: paperless-ngx-gotenberg
+    environment:
+      - DISABLE_GOOGLE_CHROME=1
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - paperless-ngx
+
+  paperless-ngx:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless-ngx
+    depends_on:
+      - paperless-ngx-redis
+      - paperless-ngx-db
+    environment:
+      - USERMAP_UID=${PUID}
+      - USERMAP_GID=${PGID}
+      - PAPERLESS_TIME_ZONE=${TZ}
+      - PAPERLESS_SECRET_KEY=${PAPERLESS_NGX_SECRET_KEY}
+      - PAPERLESS_OCR_LANGUAGE=${PAPERLESS_NGX_OCR_LANGUAGE}
+      - PAPERLESS_REDIS=redis://paperless-ngx-redis:6379
+      - PAPERLESS_DBHOST=paperless-ngx-db
+      - PAPERLESS_DBPORT=5432
+      - PAPERLESS_DBUSER=paperless
+      - PAPERLESS_DBPASS=${PAPERLESS_NGX_DB_PASSWORD}
+      - PAPERLESS_TIKA_ENABLED=1
+      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://paperless-ngx-gotenberg:3000
+      - PAPERLESS_TIKA_ENDPOINT=http://paperless-ngx-tika:9998
+    volumes:
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless-ngx.service=paperless-ngx"
+      - "traefik.http.routers.paperless-ngx.tls=true"
+      - "traefik.http.routers.paperless-ngx.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.paperless-ngx.entrypoints=websecure"
+      - "traefik.http.services.paperless-ngx.loadbalancer.server.port=8000"
+      - "traefik.http.routers.paperless-ngx.middlewares=authelia@docker"
+    # no healthcheck because there is not curl/wget
+    networks:
+      - paperless-ngx
+      - web_proxy
+
+  paperless-ngx-webdav:
+    image: paolobasso/webdav
+    container_name: paperless-ngx-webdav
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./consume:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless-ngx-webdav.service=paperless-ngx-webdav"
+      - "traefik.http.routers.paperless-ngx-webdav.tls=true"
+      - "traefik.http.routers.paperless-ngx-webdav.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.paperless-ngx-webdav.entrypoints=websecure"
+      - "traefik.http.services.paperless-ngx-webdav.loadbalancer.server.port=80"
+      - "traefik.http.routers.paperless-ngx-webdav.middlewares=authelia-basic@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  paperless-ngx:
+    driver: bridge

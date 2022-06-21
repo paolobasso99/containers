@@ -51,7 +51,7 @@ access_control:
 
     - domain:
         - syncthing-webdav.bassopaolo.com
-        - paperless-ng-webdav.bassopaolo.com
+        - paperless-ngx-webdav.bassopaolo.com
       policy: one_factor
       subject:
         - group:admins

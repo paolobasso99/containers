@@ -111,6 +111,12 @@ services:
       - "traefik.http.routers.plausible.entrypoints=websecure"
       - "traefik.http.services.plausible.loadbalancer.server.port=8000"
       - "traefik.http.routers.plausible.middlewares=authelia@docker"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:8000"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     networks:
       - plausible
       - web_proxy
