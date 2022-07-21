@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  gotify_db:
+    image: postgres:14
+    restart: unless-stopped
+    container_name: gotify_db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=gotify
+      - POSTGRES_USER=gotify
+      - POSTGRES_PASSWORD=${GOTIFY_DB_PASSWORD}
+    networks:
+      - gotify
+
+  gotify_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - gotify_db
+    container_name: gotify_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=gotify
+      - DUMPER_HOST=gotify_db
+      - DUMPER_USER=gotify
+      - DUMPER_PASSWORD=${GOTIFY_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${GOTIFY_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - gotify
+
+  gotify:
+    image: ghcr.io/gotify/server
+    depends_on:
+      - gotify_db
+    restart: unless-stopped
+    container_name: gotify
+    user: "${PUID}:${PGID}"
+    environment:
+      - GOTIFY_DATABASE_DIALECT=postgres
+      - GOTIFY_DATABASE_CONNECTION=host=gotify_db port=5432 user=gotify dbname=gotify password=${GOTIFY_DB_PASSWORD} sslmode=disable
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gotify.service=gotify"
+      - "traefik.http.routers.gotify.tls=true"
+      - "traefik.http.routers.gotify.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.gotify.entrypoints=websecure"
+      - "traefik.http.services.gotify.loadbalancer.server.port=80"
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:80"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - gotify
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  gotify:
+    driver: bridge
