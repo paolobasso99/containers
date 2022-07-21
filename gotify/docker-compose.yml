@@ -54,12 +54,6 @@ services:
       - "traefik.http.services.gotify.loadbalancer.server.port=80"
     volumes:
       - ./data:/app/data
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:80"]
-      interval: 1m
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     networks:
       - gotify
       - web_proxy
