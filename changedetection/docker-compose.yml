@@ -1,16 +1,17 @@
-version: "3"
+version: "3.7"
 
 services:
   changedetection:
     container_name: changedetection
-    image: dgtlmoon/changedetection.io
+    image: ghcr.io/dgtlmoon/changedetection.io
     restart: unless-stopped
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - PLAYWRIGHT_DRIVER_URL=ws://changedetection_playwright:3000/?stealth=1&--disable-web-security=true
     volumes:
-      - /datastore:/datastore
+      - ./datastore:/datastore
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.changedetection.service=changedetection"
@@ -21,8 +22,29 @@ services:
       - "traefik.http.routers.changedetection.middlewares=authelia@docker"
     networks:
       - web_proxy
+      - changedetection
+
+  changedetection_playwright:
+    container_name: changedetection_playwright
+    image: browserless/chrome
+    restart: unless-stopped
+    environment:
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1024
+      - SCREEN_DEPTH=16
+      - ENABLE_DEBUGGER=false
+      - PREBOOT_CHROME=true
+      - CONNECTION_TIMEOUT=300000
+      - MAX_CONCURRENT_SESSIONS=10
+      - CHROME_REFRESH_TIME=600000
+      - DEFAULT_BLOCK_ADS=true
+      - DEFAULT_STEALTH=true
+    networks:
+      - changedetection
 
 networks:
   web_proxy:
     external:
       name: web_proxy
+  changedetection:
+    driver: bridge
