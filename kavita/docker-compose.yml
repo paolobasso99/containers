@@ -1,6 +1,26 @@
 version: "3.9"
 
 services:
+  kavita_email:
+    image: kizaing/kavitaemail:latest
+    container_name: kavita_email
+    healthcheck:
+      test: curl --fail http://localhost:5003 || exit 1
+      interval: 300s
+      retries: 3
+      start_period: 30s
+      timeout: 15s
+    environment:
+      - SMTP_HOST=${KAVITA_SMTP_HOST}
+      - SMTP_PORT=${KAVITA_SMTP_PORT}
+      - SMTP_USER=${KAVITA_SMTP_USER}
+      - SMTP_PASS=${KAVITA_SMTP_PASS}
+      - SEND_ADDR=${KAVITA_SEND_ADDR}
+      - DISP_NAME=${KAVITA_DISP_NAME}
+    restart: unless-stopped
+    networks:
+      - kavita
+
   kavita:
     image: kizaing/kavita:latest
     restart: unless-stopped
@@ -22,11 +42,16 @@ services:
       - "traefik.http.routers.kavita.middlewares=authelia@docker"
     volumes:
       - ./manga:/manga
+      - ./books:/books
+      - ./comics:/comics
       - ./data:/kavita/config
     networks:
       - web_proxy
+      - kavita
 
 networks:
   web_proxy:
     external:
       name: web_proxy
+  kavita:
+    driver: bridge
