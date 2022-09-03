@@ -5,7 +5,7 @@
 # Enter key to hash: hello-world
 # c0ctY9DXsRIXnZzYBUGnzoQBd5FY2E0Mvk6KtLLMJj4=
 # echo c0ctY9DXsRIXnZzYBUGnzoQBd5FY2E0Mvk6KtLLMJj4= > auth
-version: "3.6"
+version: "3.9"
 
 services:
   linx:

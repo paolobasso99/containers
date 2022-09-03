@@ -1,6 +1,6 @@
 # For installation use: docker-compose run --rm listmonk ./listmonk --install
 
-version: "3.3"
+version: "3.9"
 
 services:
   listmonk-db:
