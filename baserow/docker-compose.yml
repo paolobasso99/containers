@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+  baserow_redis:
+    image: redis:6-alpine
+    container_name: baserow_redis
+    restart: unless-stopped
+    networks:
+      - baserow
+
+  baserow_db:
+    image: postgres:14
+    restart: unless-stopped
+    container_name: baserow_db
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=baserow
+      - POSTGRES_USER=baserow
+      - POSTGRES_PASSWORD=${BASEROW_DATABASE_PASSWORD}
+    networks:
+      - baserow
+
+  baserow_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - baserow_db
+    container_name: baserow_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=baserow
+      - DUMPER_HOST=baserow_db
+      - DUMPER_USER=baserow
+      - DUMPER_PASSWORD=${BASEROW_DATABASE_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${BASEROW_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - baserow
+
+  baserow:
+    image: baserow/baserow:1.12.1
+    container_name: baserow
+    depends_on:
+      - baserow_redis
+      - baserow_db
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - BASEROW_PUBLIC_URL=${BASEROW_PUBLIC_URL}
+      - DATABASE_PASSWORD=${BASEROW_DATABASE_PASSWORD}
+      - DATABASE_NAME=baserow
+      - DATABASE_USER=baserow
+      - DATABASE_PORT=5432
+      - DATABASE_HOST=baserow_db
+      - REDIS_URL=redis://baserow_redis:6379
+      - EMAIL_SMTP=True
+      - EMAIL_SMTP_HOST=${BASEROW_EMAIL_SMTP_HOST}
+      - EMAIL_SMTP_PORT=${BASEROW_EMAIL_SMTP_PORT}
+      - EMAIL_SMTP_USER=${BASEROW_EMAIL_SMTP_USER}
+      - EMAIL_SMTP_PASSWORD=${BASEROW_EMAIL_SMTP_PASSWORD}
+      - EMAIL_SMTP_USE_TLS=${BASEROW_EMAIL_SMTP_USE_TLS}
+    restart: unless-stopped
+    volumes:
+      - ./data:/baserow/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.baserow.service=baserow"
+      - "traefik.http.routers.baserow.tls=true"
+      - "traefik.http.routers.baserow.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.baserow.entrypoints=websecure"
+      - "traefik.http.services.baserow.loadbalancer.server.port=80"
+      - "traefik.http.routers.baserow.middlewares=authelia@docker"
+    networks:
+      - baserow
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  baserow:
+    driver: bridge
