@@ -1,0 +1,25 @@
+version: "3.9"
+
+services: 
+  silverbullet:
+    # git clone git@github.com:silverbulletmd/silverbullet.git
+    build: silverbullet
+    container_name: silverbullet
+    volumes:
+      - ./data:/space
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.silverbullet.service=silverbullet"
+      - "traefik.http.routers.silverbullet.tls=true"
+      - "traefik.http.routers.silverbullet.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.silverbullet.entrypoints=websecure"
+      - "traefik.http.services.silverbullet.loadbalancer.server.port=3000"
+      - "traefik.http.routers.silverbullet.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
