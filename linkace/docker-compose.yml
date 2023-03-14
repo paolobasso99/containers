@@ -46,6 +46,7 @@ services:
       - linkace_redis
     volumes:
       - ./.env:/app/.env
+      - ./logs:/app/storage/logs
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -60,7 +61,7 @@ services:
       - web_proxy
 
   linkace_redis:
-    image: redis:6-alpine
+    image: bitnami/redis:6.2
     container_name: linkace_redis
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
