@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  optuna_db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: optuna_db
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - 31415:5432
+    environment:
+      - POSTGRES_DB=optuna
+      - POSTGRES_USER=optuna
+      - POSTGRES_PASSWORD=${OPTUNA_DATABASE_PASSWORD}
+    networks:
+      - optuna
+
+  optuna_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - optuna_db
+    container_name: optuna_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=optuna
+      - DUMPER_HOST=optuna_db
+      - DUMPER_USER=optuna
+      - DUMPER_PASSWORD=${OPTUNA_DATABASE_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${OPTUNA_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - optuna
+
+  optuna_dashboard:
+    image: ghcr.io/optuna/optuna-dashboard:latest
+    container_name: optuna_dashboard
+    command: postgresql+psycopg2://optuna:${OPTUNA_DATABASE_PASSWORD}@optuna_db:5432/optuna
+    depends_on:
+      - optuna_db
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.optuna_dashboard.service=optuna_dashboard"
+      - "traefik.http.routers.optuna_dashboard.rule=Host(\"$OPTUNA_DASHBOARD_HOST\")"
+      - "traefik.http.routers.optuna_dashboard.tls=true"
+      - "traefik.http.routers.optuna_dashboard.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.optuna_dashboard.entrypoints=websecure"
+      - "traefik.http.services.optuna_dashboard.loadbalancer.server.port=8080"
+      - "traefik.http.routers.optuna_dashboard.middlewares=authelia@docker"
+    networks:
+      - optuna
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  optuna:
+    driver: bridge
