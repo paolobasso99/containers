@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+  kitchenowl_db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: kitchenowl_db
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=kitchenowl
+      - POSTGRES_USER=kitchenowl
+      - POSTGRES_PASSWORD=${KITCHENOWL_DATABASE_PASSWORD}
+    networks:
+      - kitchenowl
+
+  kitchenowl_db_dumper:
+    image: paolobasso/database_dumper:latest
+    restart: unless-stopped
+    depends_on:
+      - kitchenowl_db
+    container_name: kitchenowl_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_TYPE=postgres
+      - DUMPER_DATABASE=kitchenowl
+      - DUMPER_HOST=kitchenowl_db
+      - DUMPER_USER=kitchenowl
+      - DUMPER_PASSWORD=${KITCHENOWL_DATABASE_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${KITCHENOWL_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - kitchenowl
+
+  kitchenowl_web:
+    image: tombursch/kitchenowl-web:latest
+    container_name: kitchenowl_web
+    restart: unless-stopped
+    depends_on:
+      - kitchenowl_db
+      - kitchenowl_api
+    environment:
+      - BACK_URL=http://kitchenowl_api:5000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kitchenowl_web.service=kitchenowl_web"
+      - "traefik.http.routers.kitchenowl_web.tls=true"
+      - "traefik.http.routers.kitchenowl_web.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.kitchenowl_web.entrypoints=websecure"
+      - "traefik.http.services.kitchenowl_web.loadbalancer.server.port=80"
+      - "traefik.http.routers.kitchenowl_web.middlewares=authelia@docker"
+      - "traefik.http.routers.kitchenowl_web.rule=Host(\"${KITCHENOWL_FRONT_URL}\")"
+    networks:
+      - web_proxy
+      - kitchenowl
+
+  kitchenowl_api:
+    image: tombursch/kitchenowl:latest
+    container_name: kitchenowl_api
+    depends_on:
+      - kitchenowl_db
+    restart: unless-stopped
+    environment:
+      - JWT_SECRET_KEY=${KITCHENOWL_JWT_SECRET_KEY}
+      - FRONT_URL=${KITCHENOWL_FRONT_URL}
+      - DB_DRIVER=postgresql
+      - DB_HOST=kitchenowl_db
+      - DB_NAME=kitchenowl
+      - DB_USER=kitchenowl
+      - DB_PASSWORD=${KITCHENOWL_DATABASE_PASSWORD}
+    volumes:
+      - ./data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kitchenowl_api.service=kitchenowl_api"
+      - "traefik.http.routers.kitchenowl_api.tls=true"
+      - "traefik.http.routers.kitchenowl_api.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.kitchenowl_api.entrypoints=websecure"
+      - "traefik.http.services.kitchenowl_api.loadbalancer.server.port=5000"
+      #- "traefik.http.routers.kitchenowl_api.middlewares=authelia@docker"
+      - "traefik.http.routers.kitchenowl_api.rule=Host(\"${KITCHENOWL_BACK_URL}\")"
+    networks:
+      - kitchenowl
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy
+  kitchenowl:
+    driver: bridge
