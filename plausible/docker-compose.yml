@@ -68,8 +68,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.plausible-proxy.service=plausible-proxy"
-      - "traefik.http.routers.plausible-proxy.rule=Host(\"${PLAUSIBLE_PROXY_BAS\
-        E_URL}\")"
+      - "traefik.http.routers.plausible-proxy.rule=Host(\"${PLAUSIBLE_PROXY_BASE_URL}\")"
       - "traefik.http.routers.plausible-proxy.tls=true"
       - "traefik.http.routers.plausible-proxy.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.plausible-proxy.entrypoints=websecure"
@@ -80,8 +79,7 @@ services:
 
   plausible:
     image: plausible/analytics:latest
-    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db
-      migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
     depends_on:
       - plausible-db
       - plausible-clickhouse
@@ -112,7 +110,14 @@ services:
       - "traefik.http.services.plausible.loadbalancer.server.port=8000"
       - "traefik.http.routers.plausible.middlewares=authelia@docker"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:8000"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--spider",
+          "http://localhost:8000"
+        ]
       interval: 1m
       timeout: 10s
       retries: 3
