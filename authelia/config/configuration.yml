@@ -39,6 +39,12 @@ access_control:
     - domain: authelia.bassopaolo.com
       policy: bypass
 
+    - domain: searxng.bassopaolo.com
+      policy: bypass
+      resources:
+        # Rule for opensearch.xml?method=POST file
+        - "^/opensearch\\.xml\\?.*$"
+
     - domain:
         - traefik-hc01.bassopaolo.com
         - monitoring-hc01.bassopaolo.com
