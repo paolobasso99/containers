@@ -1,17 +1,28 @@
 version: "3.9"
 
 services:
+  searxng_redis:
+    container_name: searx_ngredis
+    image: redis:6-alpine
+    command: redis-server --save "" --appendonly "no"
+    networks:
+      - searxng
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+
   searxng:
     image: searxng/searxng:latest
     container_name: searxng
-    command: -f
+    depends_on:
+      - searxng_redis
     environment:
-      - BIND_ADDRESS=0.0.0.0:8080
-      - BASE_URL=https://${SEARXNG_HOSTNAME}/
-      - MORTY_URL=https://${MORTY_HOSTNAME}/
-      - MORTY_KEY=${MORTY_KEY}
+      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME}/
     volumes:
-      - ./config:/etc/searx:rw
+      - ./config:/etc/searxng:rw
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -27,11 +38,13 @@ services:
       - CHOWN
       - SETGID
       - SETUID
-      - DAC_OVERRIDE
     networks:
       - web_proxy
+      - searxng
 
 networks:
   web_proxy:
     external:
       name: web_proxy
+  searxng:
+    driver: bridge
