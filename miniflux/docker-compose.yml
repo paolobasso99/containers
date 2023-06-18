@@ -63,7 +63,6 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
   db:
     driver: bridge

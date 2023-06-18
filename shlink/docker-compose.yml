@@ -38,7 +38,7 @@ services:
   shlink_client:
     image: shlinkio/shlink-web-client
     container_name: shlink_client
-    depends_on: 
+    depends_on:
       - shlink_db
       - shlink_api
     environment:
@@ -60,11 +60,11 @@ services:
     networks:
       - web_proxy
       - shlink
-  
+
   shlink_api:
     image: shlinkio/shlink:stable
     container_name: shlink_api
-    depends_on: 
+    depends_on:
       - shlink_db
     environment:
       - PUID=${PUID}
@@ -94,7 +94,6 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
   shlink:
     driver: bridge

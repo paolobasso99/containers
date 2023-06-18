@@ -44,7 +44,7 @@ services:
 
   authelia:
     image: authelia/authelia:4
-    depends_on: 
+    depends_on:
       - authelia_redis
       - authelia_db
     container_name: authelia
@@ -102,7 +102,6 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
   authelia:
     driver: bridge

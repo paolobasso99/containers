@@ -1,6 +1,6 @@
 version: "3.9"
 
-services: 
+services:
   freshrss_db:
     image: postgres:14
     restart: unless-stopped
@@ -60,7 +60,6 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
   freshrss:
     driver: bridge

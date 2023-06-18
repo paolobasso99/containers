@@ -1,6 +1,6 @@
 version: "3.9"
 
-services: 
+services:
   jackett:
     image: linuxserver/jackett
     container_name: jackett
@@ -24,5 +24,4 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true

@@ -35,7 +35,7 @@ services:
       - --log=true
       - --log.level=WARN # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       # Certificate
-#      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server
+      #      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server
       - --certificatesResolvers.dns-cloudflare.acme.email=${CLOUDFLARE_EMAIL}
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
@@ -52,7 +52,7 @@ services:
       - --metrics.prometheus=true
       - --metrics.prometheus.entryPoint=metrics
       # Skip verification of backend certificates if needed, see https://community.containo.us/t/insecureskipverify-explanation/2195/28
-#      - --serversTransport.insecureSkipVerify=true
+      #      - --serversTransport.insecureSkipVerify=true
     labels:
       - "traefik.enable=true"
       # Dashboard
@@ -79,5 +79,4 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true

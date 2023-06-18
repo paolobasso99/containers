@@ -41,7 +41,7 @@ services:
   bookstack:
     image: ghcr.io/linuxserver/bookstack
     container_name: bookstack
-    depends_on: 
+    depends_on:
       - bookstack_db
     environment:
       - PUID=${PGID}
@@ -70,5 +70,4 @@ networks:
   db:
     driver: bridge
   web_proxy:
-    external:
-      name: web_proxy
+    external: true

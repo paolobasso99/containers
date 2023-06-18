@@ -4,14 +4,14 @@ services:
   radicale:
     image: tomsquest/docker-radicale
     container_name: radicale
-    cap_drop: 
+    cap_drop:
       - ALL
-    cap_add: 
+    cap_add:
       - CHOWN
       - SETUID
       - SETGID
       - KILL
-    security_opt: 
+    security_opt:
       - "no-new-privileges:true"
     restart: unless-stopped
     volumes:
@@ -33,5 +33,4 @@ services:
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true

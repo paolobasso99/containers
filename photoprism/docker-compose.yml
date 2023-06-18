@@ -4,7 +4,7 @@ services:
   photoprism:
     container_name: photoprism
     image: photoprism/photoprism:latest
-    depends_on: 
+    depends_on:
       - photoprism_db
     restart: unless-stopped
     user: "${PUID}:${PGID}"
@@ -97,5 +97,4 @@ networks:
   db:
     driver: bridge
   web_proxy:
-    external:
-      name: web_proxy
+    external: true

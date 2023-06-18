@@ -73,8 +73,7 @@ networks:
   grafana:
     driver: bridge
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
   prometheus:
     external:
       name: prometheus

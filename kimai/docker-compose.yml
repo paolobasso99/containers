@@ -41,7 +41,7 @@ services:
   kimai:
     image: kimai/kimai2:apache-latest
     container_name: kimai
-    depends_on: 
+    depends_on:
       - kimai_db
     environment:
       - PUID=${PGID}
@@ -68,5 +68,4 @@ networks:
   db:
     driver: bridge
   web_proxy:
-    external:
-      name: web_proxy
+    external: true

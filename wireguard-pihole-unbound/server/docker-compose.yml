@@ -49,7 +49,7 @@ services:
     volumes:
       - ./pihole/config:/etc/pihole/
       - ./pihole/dnsmasq.d/:/etc/dnsmasq.d/
-    dns: 
+    dns:
       - 127.0.0.1
     restart: unless-stopped
     labels:
@@ -72,5 +72,4 @@ networks:
       config:
         - subnet: ${INTERNAL_NETWORK_SUBNET}.0.0/16
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
