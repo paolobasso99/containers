@@ -5,16 +5,25 @@ services:
     container_name: changedetection
     image: ghcr.io/dgtlmoon/changedetection.io
     restart: unless-stopped
+    depends_on:
+      changedetection_selenium:
+        condition: service_started
+      changedetection_playwright:
+        condition: service_started
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - BASE_URL=https://${CHANGEDETECTION_HOST}
+      - WEBDRIVER_URL=http://changedetection_selenium:4444/wd/hub
       - PLAYWRIGHT_DRIVER_URL=ws://changedetection_playwright:3000/?stealth=1&--disable-web-security=true
+      - HIDE_REFERER=true
     volumes:
       - ./datastore:/datastore
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.changedetection.service=changedetection"
+      - "traefik.http.routers.changedetection.rule=Host(\"$CHANGEDETECTION_HOST\")"
       - "traefik.http.routers.changedetection.tls=true"
       - "traefik.http.routers.changedetection.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.changedetection.entrypoints=websecure"
@@ -22,6 +31,20 @@ services:
       - "traefik.http.routers.changedetection.middlewares=authelia@docker"
     networks:
       - web_proxy
+      - changedetection
+
+  changedetection_selenium:
+    container_name: changedetection_selenium
+    image: selenium/standalone-chrome-debug:3.141.59
+    restart: unless-stopped
+    volumes:
+      - /dev/shm:/dev/shm
+    environment:
+      - VNC_NO_PASSWORD=1
+      - SCREEN_WIDTH=1920
+      - SCREEN_HEIGHT=1080
+      - SCREEN_DEPTH=24
+    networks:
       - changedetection
 
   changedetection_playwright:
@@ -39,6 +62,7 @@ services:
       - CHROME_REFRESH_TIME=600000
       - DEFAULT_BLOCK_ADS=true
       - DEFAULT_STEALTH=true
+      - DEFAULT_IGNORE_HTTPS_ERRORS=true
     networks:
       - changedetection
 
