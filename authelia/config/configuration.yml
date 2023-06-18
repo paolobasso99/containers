@@ -43,7 +43,8 @@ access_control:
       policy: bypass
       resources:
         # Rule for opensearch.xml?method=POST file
-        - "^/opensearch\\.xml\\?.*$"
+        - "^/opensearch\\.xml(\\?.*)?$"
+        - "^/autocompleter(\\?.*)?$"
 
     - domain:
         - traefik-hc01.bassopaolo.com
