@@ -19,7 +19,7 @@ services:
       - db
 
   traccar_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:mariadb
     restart: unless-stopped
     depends_on:
       - traccar_db
@@ -29,7 +29,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=mysql
       - DUMPER_DATABASE=traccar
       - DUMPER_HOST=traccar_db
       - DUMPER_USER=traccar

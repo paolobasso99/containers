@@ -16,7 +16,7 @@ services:
       - shlink
 
   shlink_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-14
     restart: unless-stopped
     depends_on:
       - shlink_db
@@ -26,7 +26,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=shlink
       - DUMPER_HOST=shlink_db
       - DUMPER_USER=shlink

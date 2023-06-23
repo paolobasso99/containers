@@ -18,7 +18,7 @@ services:
       - db
 
   miniflux_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-14
     restart: unless-stopped
     depends_on:
       - miniflux_db
@@ -28,7 +28,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=miniflux
       - DUMPER_HOST=miniflux_db
       - DUMPER_USER=miniflux

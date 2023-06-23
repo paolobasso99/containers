@@ -15,7 +15,7 @@ services:
       - plausible
 
   plausible-db-dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-14
     restart: unless-stopped
     depends_on:
       - plausible-db
@@ -25,7 +25,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=plausible
       - DUMPER_HOST=plausible-db
       - DUMPER_USER=plausible

@@ -15,7 +15,7 @@ services:
       - kitchenowl
 
   kitchenowl_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-15
     restart: unless-stopped
     depends_on:
       - kitchenowl_db
@@ -25,7 +25,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=kitchenowl
       - DUMPER_HOST=kitchenowl_db
       - DUMPER_USER=kitchenowl

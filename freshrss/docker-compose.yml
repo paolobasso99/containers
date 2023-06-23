@@ -15,7 +15,7 @@ services:
       - freshrss
 
   freshrss_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-14
     restart: unless-stopped
     depends_on:
       - freshrss_db
@@ -25,7 +25,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=freshrss
       - DUMPER_HOST=freshrss_db
       - DUMPER_USER=freshrss

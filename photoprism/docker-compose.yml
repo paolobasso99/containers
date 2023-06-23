@@ -74,7 +74,7 @@ services:
       - db
 
   photoprism_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:mariadb
     restart: unless-stopped
     depends_on:
       - photoprism_db
@@ -84,7 +84,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=mysql
       - DUMPER_DATABASE=photoprism
       - DUMPER_HOST=photoprism_db
       - DUMPER_USER=photoprism

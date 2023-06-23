@@ -17,7 +17,7 @@ services:
       - optuna
 
   optuna_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-15
     restart: unless-stopped
     depends_on:
       - optuna_db
@@ -27,7 +27,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=optuna
       - DUMPER_HOST=optuna_db
       - DUMPER_USER=optuna

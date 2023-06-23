@@ -19,7 +19,7 @@ services:
       - db
 
   bookstack_db_dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:mariadb
     restart: unless-stopped
     depends_on:
       - bookstack_db
@@ -29,7 +29,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=mysql
       - DUMPER_DATABASE=bookstack
       - DUMPER_HOST=bookstack_db
       - DUMPER_USER=bookstack

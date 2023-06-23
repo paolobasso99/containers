@@ -23,7 +23,7 @@ services:
       - paperless-ngx
 
   paperless-ngx-db-dumper:
-    image: paolobasso/database_dumper:latest
+    image: paolobasso/database_dumper:postgres-14
     restart: unless-stopped
     depends_on:
       - paperless-ngx-db
@@ -33,7 +33,6 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_TYPE=postgres
       - DUMPER_DATABASE=paperless
       - DUMPER_HOST=paperless-ngx-db
       - DUMPER_USER=paperless
