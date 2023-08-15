@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  multi-scrobbler:
+    image: ghcr.io/foxxmd/multi-scrobbler:latest
+    container_name: multi-scrobbler
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - MALOJA_API_KEY=${MALOJA_API_KEY}
+      - MALOJA_URL=${MALOJA_URL}
+      - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID}
+    volumes:
+      - ./config:/config
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.multi-scrobbler.service=multi-scrobbler"
+      - "traefik.http.routers.multi-scrobbler.tls=true"
+      - "traefik.http.routers.multi-scrobbler.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.multi-scrobbler.entrypoints=websecure"
+      - "traefik.http.services.multi-scrobbler.loadbalancer.server.port=9078"
+      - "traefik.http.routers.multi-scrobbler.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external: true
