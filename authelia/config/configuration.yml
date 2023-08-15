@@ -46,6 +46,11 @@ access_control:
         - "^/opensearch\\.xml(\\?.*)?$"
         - "^/autocompleter(\\?.*)?$"
 
+    - domain: maloja.bassopaolo.com
+      policy: bypass
+      resources:
+        - "^/apis/.*$"
+
     - domain:
         - traefik-hc01.bassopaolo.com
         - monitoring-hc01.bassopaolo.com
