@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    user: ${PUID}:${PGID}
+    container_name: navidrome
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - ND_SCANSCHEDULE=1h
+      - ND_LOGLEVEL=info
+      - ND_SESSIONTIMEOUT=24h
+      - ND_BASEURL=${ND_BASEURL}
+    volumes:
+      - ./data:/data
+      - /mnt/syncthing/music:/music:ro
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.navidrome.service=navidrome"
+      - "traefik.http.routers.navidrome.tls=true"
+      - "traefik.http.routers.navidrome.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.navidrome.entrypoints=websecure"
+      - "traefik.http.services.navidrome.loadbalancer.server.port=4533"
+      - "traefik.http.routers.navidrome.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external: true
