@@ -12,7 +12,7 @@ services:
       - ND_SCANSCHEDULE=1h
       - ND_LOGLEVEL=info
       - ND_SESSIONTIMEOUT=24h
-      - ND_BASEURL=${ND_BASEURL}
+      - ND_LISTENBRAINZ_BASEURL=${ND_LISTENBRAINZ_BASEURL}
     volumes:
       - ./data:/data
       - /mnt/syncthing/music:/music:ro
