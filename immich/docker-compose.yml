@@ -1,0 +1,154 @@
+version: "3.9"
+
+services:
+  immich_db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: immich_db
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=immich
+      - POSTGRES_USER=immich
+      - POSTGRES_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+    networks:
+      - immich
+
+  immich_db_dumper:
+    image: paolobasso/database_dumper:postgres-15
+    restart: unless-stopped
+    depends_on:
+      - immich_db
+    container_name: immich_db_dumper
+    volumes:
+      - ./dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_DATABASE=immich
+      - DUMPER_HOST=immich_db
+      - DUMPER_USER=immich
+      - DUMPER_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${IMMICH_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - immich
+
+  immich_server:
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    container_name: immich_server
+    command: ["start.sh", "immich"]
+    depends_on:
+      - immich_db
+      - immich_redis
+      - immich_typesense
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - IMMICH_MACHINE_LEARNING_ENABLED=false
+      - DB_HOSTNAME=immich_db
+      - DB_USERNAME=immich
+      - DB_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+      - DB_DATABASE_NAME=immich
+      - DB_PORT=5432
+      - REDIS_HOSTNAME=immich_redis
+      - REDIS_PORT=6379
+      - TYPESENSE_HOSTNAME=immich_typesense
+      - TYPESENSE_PORT=8108
+      - TYPESENSE_API_KEY=${IMMICH_TYPESENSE_API_KEY}
+    volumes:
+      - ${IMMICH_UPLOAD_PATH}:/usr/src/app/upload
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.immich_server.service=immich_server"
+      - "traefik.http.routers.immich_server.tls=true"
+      - "traefik.http.routers.immich_server.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.immich_server.entrypoints=websecure"
+      - "traefik.http.routers.immich_server.rule=Host(`immich-server.${IMMICH_DOMAIN}`)"
+      - "traefik.http.services.immich_server.loadbalancer.server.port=3001"
+    networks:
+      - immich
+      - web_proxy
+
+  immich_microservices:
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    container_name: immich_microservices
+    command: ["start.sh", "microservices"]
+    volumes:
+      - ${IMMICH_UPLOAD_PATH}:/usr/src/app/upload
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - IMMICH_MACHINE_LEARNING_ENABLED=false
+      - DB_HOSTNAME=immich_db
+      - DB_USERNAME=immich
+      - DB_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+      - DB_DATABASE_NAME=immich
+      - DB_PORT=5432
+      - REDIS_HOSTNAME=immich_redis
+      - REDIS_PORT=6379
+      - TYPESENSE_HOSTNAME=immich_typesense
+      - TYPESENSE_PORT=8108
+      - TYPESENSE_API_KEY=${IMMICH_TYPESENSE_API_KEY}
+    depends_on:
+      - immich_db
+      - immich_redis
+      - immich_typesense
+    restart: unless-stopped
+    networks:
+      - immich
+
+  immich_web:
+    container_name: immich_web
+    image: ghcr.io/immich-app/immich-web:${IMMICH_VERSION:-release}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - IMMICH_SERVER_URL=http://immich_server:3001
+      - PUBLIC_IMMICH_SERVER_URL=https://immich-server.${IMMICH_DOMAIN}
+      - IMMICH_API_URL_EXTERNAL=/api
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.immich_web.service=immich_web"
+      - "traefik.http.routers.immich_web.tls=true"
+      - "traefik.http.routers.immich_web.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.immich_web.entrypoints=websecure"
+      - "traefik.http.routers.immich_web.rule=Host(`immich.${IMMICH_DOMAIN}`)"
+      - "traefik.http.services.immich_web.loadbalancer.server.port=3000"
+    networks:
+      - immich
+      - web_proxy
+
+  immich_redis:
+    image: redis:6-alpine
+    container_name: immich_redis
+    restart: unless-stopped
+    networks:
+      - immich
+
+  immich_typesense:
+    container_name: immich_typesense
+    image: typesense/typesense:0.24.1
+    restart: unless-stopped
+    volumes:
+      - ./typesense:/data
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - TYPESENSE_API_KEY=${IMMICH_TYPESENSE_API_KEY}
+      - TYPESENSE_DATA_DIR=/data
+      # remove this to get debug messages
+      - GLOG_minloglevel=1
+    networks:
+      - immich
+
+networks:
+  web_proxy:
+    external: true
+  immich:
+    driver: bridge
