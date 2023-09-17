@@ -15,7 +15,7 @@ services:
       - ND_LISTENBRAINZ_BASEURL=${ND_LISTENBRAINZ_BASEURL}
     volumes:
       - ./data:/data
-      - /mnt/syncthing/music:/music:ro
+      - /mnt/storagebox/music:/music:ro,rslave
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
