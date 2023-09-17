@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr
+    container_name: recyclarr
+    user: ${PUID}:${PGID}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+    networks:
+      - torrent
+
+networks:
+  torrent:
+    external: true

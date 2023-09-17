@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    #    user: ${PUID}:${PGID}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_PublishedServerUrl}
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /mnt/storagebox/movies:/movies:rw,rslave
+      - /mnt/storagebox/tv:/tv:rw,rslave
+      - /mnt/storagebox/music:/music:rw,rslave
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.service=jellyfin"
+      - "traefik.http.routers.jellyfin.tls=true"
+      - "traefik.http.routers.jellyfin.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    #      - "traefik.http.routers.jellyfin.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+      - torrent
+
+networks:
+  web_proxy:
+    external: true
+  torrent:
+    external: true

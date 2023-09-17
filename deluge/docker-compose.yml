@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  deluge:
+    image: binhex/arch-delugevpn:latest
+    container_name: deluge
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - UMASK=000
+      - TZ=${TZ}
+      - VPN_ENABLED=yes
+      - VPN_PROV=custom
+      - VPN_CLIENT=openvpn
+      - VPN_USER=${VPN_USER}
+      - VPN_PASS=${VPN_PASS}
+      - ENABLE_PRIVOXY=no
+      - LAN_NETWORK=192.168.1.0/24
+      - NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1
+      - DELUGE_DAEMON_LOG_LEVEL=info
+      - DELUGE_WEB_LOG_LEVEL=info
+      - DELUGE_ENABLE_WEBUI_PASSWORD=yes
+      - DEBUG=false
+    volumes:
+      - ./config:/config
+      - /mnt/storagebox/downloads:/downloads:rw,rslave
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    cap_add:
+      - "NET_ADMIN"
+    networks:
+      - torrent
+
+  deluge_proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    container_name: deluge_proxy
+    command: caddy reverse-proxy --from :80 --to deluge:8112
+    user: "${PUID}:${PGID}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.plausible-proxy.service=plausible-proxy"
+      - 'traefik.http.routers.plausible-proxy.rule=Host("${DELUGE_HOST}")'
+      - "traefik.http.routers.plausible-proxy.tls=true"
+      - "traefik.http.routers.plausible-proxy.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.plausible-proxy.entrypoints=websecure"
+      - "traefik.http.services.plausible-proxy.loadbalancer.server.port=80"
+    networks:
+      - torrent
+      - web_proxy
+
+networks:
+  web_proxy:
+    external: true
+  torrent:
+    external: true

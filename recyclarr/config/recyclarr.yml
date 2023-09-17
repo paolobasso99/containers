@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/master/schemas/config-schema.json
+
+# A starter config to use with Recyclarr. Most values are set to "reasonable defaults". Update the
+# values below as needed for your instance. You will be required to update the API Key and URL for
+# each instance you want to use.
+#
+# Many optional settings have been omitted to keep this template simple. Note that there's no "one
+# size fits all" configuration. Please refer to the guide to understand how to build the appropriate
+# configuration based on your hardware setup and capabilities.
+#
+# For any lines that mention uncommenting YAML, you simply need to remove the leading hash (`#`).
+# The YAML comments will already be at the appropriate indentation.
+#
+# For more details on the configuration, see the Configuration Reference on the wiki here:
+# https://recyclarr.dev/wiki/yaml/config-reference/
+
+# Configuration specific to Sonarr
+sonarr:
+  series:
+    # Set the URL/API Key to your actual instance
+    base_url: http://sonarr:8989
+    api_key: !env_var SONARR_API_KEY
+
+    # Quality definitions from the guide to sync to Sonarr. Choices: series, anime
+    quality_definition:
+      type: series
+
+    # Release profiles from the guide to sync to Sonarr v3 (Sonarr v4 does not use this!)
+    # Use `recyclarr list release-profiles` for values you can put here.
+    # https://trash-guides.info/Sonarr/Sonarr-Release-Profile-RegEx/
+    release_profiles:
+      # Series
+      - trash_ids:
+          - EBC725268D687D588A20CBC5F97E538B # Low Quality Groups
+          - 1B018E0C53EC825085DD911102E2CA36 # Release Sources (Streaming Service)
+          - 71899E6C303A07AF0E4746EFF9873532 # P2P Groups + Repack/Proper
+      # Anime (Uncomment below if you want it)
+      #- trash_ids:
+      #    - d428eda85af1df8904b4bbe4fc2f537c # Anime - First release profile
+      #    - 6cd9e10bb5bb4c63d2d7cd3279924c7b # Anime - Second release profile
+
+# Configuration specific to Radarr.
+radarr:
+  movies:
+    # Set the URL/API Key to your actual instance
+    base_url: http://radarr:7878
+    api_key: !env_var RADARR_API_KEY
+
+    # Which quality definition in the guide to sync to Radarr. Only choice right now is 'movie'
+    quality_definition:
+      type: movie
+
+    # Set to 'true' to automatically remove custom formats from Radarr when they are removed from
+    # the guide or your configuration. This will NEVER delete custom formats you manually created!
+    delete_old_custom_formats: false
+
+    custom_formats:
+      # A list of custom formats to sync to Radarr.
+      # Use `recyclarr list custom-formats radarr` for values you can put here.
+      # https://trash-guides.info/Radarr/Radarr-collection-of-custom-formats/
+      - trash_ids:
+          # Movie Versions
+          - 570bc9ebecd92723d2d21500f4be314c # Remastered
+          - eca37840c13c6ef2dd0262b141a5482f # 4K Remaster
+          - e0c07d59beb37348e975a930d5e50319 # Criterion Collection
+          - 9d27d9d2181838f76dee150882bdc58c # Masters of Cinema
+          - db9b4c4b53d312a3ca5f1378f6440fc9 # Vinegar Syndrome
+          - 957d0f44b592285f26449575e8b1167e # Special Edition
+          - eecf3a857724171f968a66cb5719e152 # IMAX
+          - 9f6cbff8cfe4ebbc1bde14c7b7bec0de # IMAX Enhanced
+          # HQ Release Groups
+          - ed27ebfef2f323e964fb1f61391bcb35 # HD Bluray Tier 01
+          - c20c8647f2746a1f4c4262b0fbbeeeae # HD Bluray Tier 02
+          - 5608c71bcebba0a5e666223bae8c9227 # HD Bluray Tier 03
+          - c20f169ef63c5f40c2def54abaf4438e # WEB Tier 01
+          - 403816d65392c79236dcb6dd591aeda4 # WEB Tier 02
+          - af94e0fe497124d1f9ce732069ec8c3b # WEB Tier 03
+          # Misc
+          - e7718d7a3ce595f289bfee26adc178f5 # Repack/Proper
+          - ae43b294509409a6a13919dedd4764c4 # Repack2
+          # Unwanted
+          - ed38b889b31be83fda192888e2286d83 # BR-DISK
+          - 90a6f9a284dff5103f6346090e6280c8 # LQ
+          - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
+          - b8cd450cbfa689c0259a01d9e29ba3d6 # 3D
+          # Streaming Services
+          - b3b3a6ac74ecbd56bcdbefa4799fb9df # AMZN
+          - 40e9380490e748672c2522eaaeb692f7 # ATVP
+          - cc5e51a9e85a6296ceefe097a77f12f4 # BCORE
+          - f6ff65b3f4b464a79dcc75950fe20382 # CRAV
+          - 16622a6911d1ab5d5b8b713d5b0036d4 # CRiT
+          - 84272245b2988854bfb76a16e60baea5 # DSNP
+          - 509e5f41146e278f9eab1ddaceb34515 # HBO
+          - 5763d1b0ce84aff3b21038eea8e9b8ad # HMAX
+          - 6a061313d22e51e0f25b7cd4dc065233 # MAX
+          - 526d445d4c16214309f0fd2b3be18a89 # Hulu
+          - 2a6039655313bf5dab1e43523b62c374 # MA
+          - 170b1d363bd8516fbf3a3eb05d4faff6 # NF
+          - bf7e73dd1d85b12cc527dc619761c840 # Pathe
+          - c9fd353f8f5f1baf56dc601c4cb29920 # PCOK
+          - e36a0ba1bc902b26ee40818a1d59b8bd # PMTP
+          - c2863d2a50c9acad1fb50e53ece60817 # STAN
+          - fbca986396c5e695ef7b2def3c755d01 # OViD
+
+
+        # Uncomment the below properties to specify one or more quality profiles that should be
+        # updated with scores from the guide for each custom format. Without this, custom formats
+        # are synced to Radarr but no scores are set in any quality profiles.
+        #quality_profiles:
+        #  - name: Quality Profile 1
+        #  - name: Quality Profile 2
+        #    #score: -9999 # Optional score to assign to all CFs. Overrides scores in the guide.
+        #    #reset_unmatched_scores: true # Optionally set other scores to 0 if they are not listed in 'names' above.
+        quality_profiles:
+            - name: HD-1080p

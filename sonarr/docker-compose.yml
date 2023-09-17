@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/config
+      - /mnt/storagebox/downloads:/downloads:rw,rslave
+      - /mnt/storagebox/tv:/tv:rw,rslave
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.service=sonarr"
+      - "traefik.http.routers.sonarr.tls=true"
+      - "traefik.http.routers.sonarr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+      - "traefik.http.routers.sonarr.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+      - torrent
+
+networks:
+  web_proxy:
+    external: true
+  torrent:
+    external: true

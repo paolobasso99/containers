@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - SONARR_API_KEY=${SONARR_API_KEY}
+      - RADARR_API_KEY=${RADARR_API_KEY}
+    volumes:
+      - ./config:/config
+    restart: unless-stopped
+    networks:
+      - torrent
+
+networks:
+  torrent:
+    external: true
