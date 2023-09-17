@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./config:/config
+      - /mnt/storagebox/movies:/movies:rw,rslave
+      - /mnt/storagebox/tv:/tv:rw,rslave
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.service=bazarr"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=7878"
+      - "traefik.http.routers.bazarr.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+      - torrent
+
+networks:
+  web_proxy:
+    external: true
+  torrent:
+    external: true
