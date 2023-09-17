@@ -21,7 +21,10 @@ services:
       - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
     networks:
       - web_proxy
+      - torrent
 
 networks:
   web_proxy:
+    external: true
+  torrent:
     external: true
