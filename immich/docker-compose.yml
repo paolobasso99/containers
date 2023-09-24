@@ -65,7 +65,9 @@ services:
       - "traefik.http.routers.immich_server.tls=true"
       - "traefik.http.routers.immich_server.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.immich_server.entrypoints=websecure"
-      - "traefik.http.routers.immich_server.rule=Host(`immich-server.${IMMICH_DOMAIN}`)"
+      - 'traefik.http.routers.immich_server.rule=Host(`${IMMICH_HOST}`) && PathPrefix("/api/")'
+      - "traefik.http.middlewares.immich_server.stripprefix.prefixes=/api/"
+      - "traefik.http.routers.immich_server.middlewares=immich_server"
       - "traefik.http.services.immich_server.loadbalancer.server.port=3001"
     networks:
       - immich
@@ -108,7 +110,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - IMMICH_SERVER_URL=http://immich_server:3001
-      - PUBLIC_IMMICH_SERVER_URL=https://immich-server.${IMMICH_DOMAIN}
+      - PUBLIC_IMMICH_SERVER_URL=http://immich_server:3001
       - IMMICH_API_URL_EXTERNAL=/api
     restart: unless-stopped
     labels:
@@ -117,8 +119,9 @@ services:
       - "traefik.http.routers.immich_web.tls=true"
       - "traefik.http.routers.immich_web.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.immich_web.entrypoints=websecure"
-      - "traefik.http.routers.immich_web.rule=Host(`immich.${IMMICH_DOMAIN}`)"
+      - "traefik.http.routers.immich_web.rule=Host(`${IMMICH_HOST}`)"
       - "traefik.http.services.immich_web.loadbalancer.server.port=3000"
+      - "traefik.http.routers.immich_web.middlewares=authelia@docker"
     networks:
       - immich
       - web_proxy
