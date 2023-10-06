@@ -1,96 +1,108 @@
 version: "3.9"
 
 services:
-  paperless-ngx-redis:
-    image: redis:6-alpine
-    container_name: paperless-ngx-redis
+  paperless_ngx_redis:
+    image: docker.io/library/redis:7.2.1-alpine@sha256:7f5a0dfbf379db69dc78434091dce3220e251022e71dcdf36207928cbf9010de
+    container_name: paperless_ngx_redis
     restart: unless-stopped
     networks:
-      - paperless-ngx
+      - paperless_ngx
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
 
-  paperless-ngx-db:
-    image: postgres:14
+  paperless_ngx_db:
+    image: docker.io/library/postgres:15.4-alpine@sha256:d5260755faa5e967902b74b4b9bf9c6ade5c40ed9620b76a675c6bc2ec8160df
     restart: unless-stopped
-    container_name: paperless-ngx-db
-    user: "${PUID}:${PGID}"
+    container_name: papeless_ngx_db
+    # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
+    # user: "${PUID}:${PGID}"
     volumes:
       - ./db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=paperless
-      - POSTGRES_USER=paperless
+      - POSTGRES_DB=paperless_ngx
+      - POSTGRES_USER=paperless_ngx
       - POSTGRES_PASSWORD=${PAPERLESS_NGX_DB_PASSWORD}
     networks:
-      - paperless-ngx
+      - paperless_ngx
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
-  paperless-ngx-db-dumper:
-    image: paolobasso/database_dumper:postgres-14
+  paperless_ngx_db_dumper:
+    image: docker.io/paolobasso/database_dumper:postgres-15
     restart: unless-stopped
     depends_on:
-      - paperless-ngx-db
-    container_name: paperless-ngx-db-dumper
+      - paperless_ngx_db
+    container_name: paperless_ngx_db_dumper
     volumes:
-      - ./dumps:/dumps
+      - ./db_dumps:/dumps
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - DUMPER_DATABASE=paperless
-      - DUMPER_HOST=paperless-ngx-db
+      - DUMPER_HOST=paperless_ngx_db
       - DUMPER_USER=paperless
       - DUMPER_PASSWORD=${PAPERLESS_NGX_DB_PASSWORD}
       - DUMPER_HEALTHCHECKS_URL=${PAPERLESS_NGX_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
-      - paperless-ngx
+      - paperless_ngx
 
-  paperless-ngx-tika:
-    image: apache/tika
-    container_name: paperless-ngx-tika
+  paperless_ngx_tika:
+    image: ghcr.io/paperless-ngx/tika@sha256:b6154c8778cf6fd8ca46ba96f25846241ffdb12d033b578f8cd85893734eb155
+    container_name: paperless_ngx_tika
     restart: unless-stopped
-    # no healthcheck because there is not curl/wget
+    user: ${PUID}:${PGID}
     networks:
-      - paperless-ngx
+      - paperless_ngx
 
-  paperless-ngx-gotenberg:
-    image: thecodingmachine/gotenberg
+  paperless_ngx_gotenberg:
+    image: docker.io/gotenberg/gotenberg:7.9.2@sha256:8ec8163ea9ef8ebe0b6306ae6b1a313cf5c59a6084d2852ba3bbe8860a486ec1
     restart: unless-stopped
-    container_name: paperless-ngx-gotenberg
-    environment:
-      - DISABLE_GOOGLE_CHROME=1
+    container_name: paperless_ngx_gotenberg
+    user: ${PUID}:${PGID}
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "--fail",
-          "http://localhost:3000/health"
-        ]
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/health"]
       interval: 1m
       timeout: 10s
       retries: 3
       start_period: 30s
     networks:
-      - paperless-ngx
+      - paperless_ngx
 
-  paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
-    container_name: paperless-ngx
+  paperless_ngx:
+    image: ghcr.io/paperless-ngx/paperless-ngx:1.17.4@sha256:8891bca890aae67adb77ebfd6e883999168378c4735fb65d0fddda182281697f
+    container_name: paperless_ngx
     depends_on:
-      - paperless-ngx-redis
-      - paperless-ngx-db
+      - paperless_ngx_redis
+      - paperless_ngx_db
+      - paperless_ngx_tika
+      - paperless_ngx_gotenberg
     environment:
       - USERMAP_UID=${PUID}
       - USERMAP_GID=${PGID}
       - PAPERLESS_TIME_ZONE=${TZ}
       - PAPERLESS_SECRET_KEY=${PAPERLESS_NGX_SECRET_KEY}
       - PAPERLESS_OCR_LANGUAGE=${PAPERLESS_NGX_OCR_LANGUAGE}
-      - PAPERLESS_REDIS=redis://paperless-ngx-redis:6379
-      - PAPERLESS_DBHOST=paperless-ngx-db
+      - PAPERLESS_REDIS=redis://paperless_ngx_redis:6379
+      - PAPERLESS_DBHOST=paperless_ngx_db
       - PAPERLESS_DBPORT=5432
       - PAPERLESS_DBUSER=paperless
       - PAPERLESS_DBPASS=${PAPERLESS_NGX_DB_PASSWORD}
       - PAPERLESS_TIKA_ENABLED=1
-      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://paperless-ngx-gotenberg:3000
-      - PAPERLESS_TIKA_ENDPOINT=http://paperless-ngx-tika:9998
-      - PAPERLESS_URL=${PAPERLESS_NGX_URL}
+      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://paperless_ngx_gotenberg:3000
+      - PAPERLESS_TIKA_ENDPOINT=http://paperless_ngx_tika:9998
+      - PAPERLESS_URL=https://${PAPERLESS_NGX_HOST}
     volumes:
       - ./data:/usr/src/paperless/data
       - ./media:/usr/src/paperless/media
@@ -99,20 +111,26 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.paperless-ngx.service=paperless-ngx"
-      - "traefik.http.routers.paperless-ngx.tls=true"
-      - "traefik.http.routers.paperless-ngx.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.paperless-ngx.entrypoints=websecure"
-      - "traefik.http.services.paperless-ngx.loadbalancer.server.port=8000"
-      - "traefik.http.routers.paperless-ngx.middlewares=authelia@docker"
-    # no healthcheck because there is not curl/wget
+      - "traefik.http.routers.paperless_ngx.service=paperless_ngx"
+      - "traefik.http.routers.paperless_ngx.tls=true"
+      - "traefik.http.routers.paperless_ngx.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.paperless_ngx.entrypoints=websecure"
+      - "traefik.http.services.paperless_ngx.loadbalancer.server.port=8000"
+      - "traefik.http.routers.paperless_ngx.middlewares=authelia@docker"
+      - 'traefik.http.routers.papeless_ngx.rule=Host("$PAPERLESS_NGX_HOST")'
     networks:
-      - paperless-ngx
+      - paperless_ngx
       - web_proxy
+    healthcheck:
+      test:
+        ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-  paperless-ngx-webdav:
-    image: paolobasso/webdav
-    container_name: paperless-ngx-webdav
+  paperless_ngx_webdav:
+    image: docker.io/paolobasso/webdav
+    container_name: paperless_ngx_webdav
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -122,17 +140,17 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.paperless-ngx-webdav.service=paperless-ngx-webdav"
-      - "traefik.http.routers.paperless-ngx-webdav.tls=true"
-      - "traefik.http.routers.paperless-ngx-webdav.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.paperless-ngx-webdav.entrypoints=websecure"
-      - "traefik.http.services.paperless-ngx-webdav.loadbalancer.server.port=80"
-      - "traefik.http.routers.paperless-ngx-webdav.middlewares=authelia-basic@docker"
+      - "traefik.http.routers.paperless_ngx_webdav.service=paperless_ngx_webdav"
+      - "traefik.http.routers.paperless_ngx_webdav.tls=true"
+      - "traefik.http.routers.paperless_ngx_webdav.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.paperless_ngx_webdav.entrypoints=websecure"
+      - "traefik.http.services.paperless_ngx_webdav.loadbalancer.server.port=80"
+      - "traefik.http.routers.paperless_ngx_webdav.middlewares=authelia-basic@docker"
     networks:
       - web_proxy
 
 networks:
   web_proxy:
     external: true
-  paperless-ngx:
+  paperless_ngx:
     driver: bridge

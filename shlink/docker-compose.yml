@@ -2,10 +2,11 @@ version: "3.9"
 
 services:
   shlink_db:
-    image: postgres:14
+    image: docker.io/library/postgres:15.4-alpine@sha256:d5260755faa5e967902b74b4b9bf9c6ade5c40ed9620b76a675c6bc2ec8160df
     restart: unless-stopped
     container_name: shlink_db
-    user: "${PUID}:${PGID}"
+    # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
+    # user: "${PUID}:${PGID}"
     volumes:
       - ./db:/var/lib/postgresql/data
     environment:
@@ -14,15 +15,21 @@ services:
       - POSTGRES_PASSWORD=${SHLINK_DB_PASSWORD}
     networks:
       - shlink
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
   shlink_db_dumper:
-    image: paolobasso/database_dumper:postgres-14
+    image: docker.io/paolobasso/database_dumper:postgres-15
     restart: unless-stopped
     depends_on:
       - shlink_db
     container_name: shlink_db_dumper
     volumes:
-      - ./dumps:/dumps
+      - ./db_dumps:/dumps
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -35,22 +42,20 @@ services:
       - shlink
 
   shlink_client:
-    image: shlinkio/shlink-web-client
+    image: docker.io/shlinkio/shlink-web-client:3.10.2@sha256:4f8224d9b197def458da4a6dc9c9cd15bf033ac2a15ca368336a8bd911c394e9
     container_name: shlink_client
+    user: ${PUID}:${PGID}
     depends_on:
       - shlink_db
-      - shlink_api
+      - shlink_server
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - SHLINK_SERVER_URL=https://${SHLINK_API_SUBDOMAIN}.${SHLINK_BASEDOMAIN}
+      - SHLINK_SERVER_URL=https://${SHLINK_SERVER_HOST}
       - SHLINK_SERVER_API_KEY=${SHLINK_SERVER_API_KEY}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shlink_client.service=shlink_client"
-      - "traefik.http.routers.shlink_client.rule=Host(\"shlink.$SHLINK_BASEDOMAIN\")"
+      - 'traefik.http.routers.shlink_client.rule=Host("$SHLINK_CLIENT_HOST")'
       - "traefik.http.routers.shlink_client.tls=true"
       - "traefik.http.routers.shlink_client.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.shlink_client.entrypoints=websecure"
@@ -58,20 +63,17 @@ services:
       - "traefik.http.routers.shlink_client.middlewares=authelia@docker"
     networks:
       - web_proxy
-      - shlink
 
-  shlink_api:
-    image: shlinkio/shlink:stable
-    container_name: shlink_api
+  shlink_server:
+    image: docker.io/shlinkio/shlink:3.6.4@sha256:c57a417966c2464b0886423ad789e2d581cc7c1f97434a63697f1a13fe00dc4a
+    container_name: shlink_server
+    user: ${PUID}:${PGID}
     depends_on:
       - shlink_db
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - DEFAULT_DOMAIN=${SHLINK_API_SUBDOMAIN}.${SHLINK_BASEDOMAIN}
+      - DEFAULT_DOMAIN=${SHLINK_SERVER_HOST}
       - IS_HTTPS_ENABLED=true
-      - DEFAULT_BASE_URL_REDIRECT=https://${SHLINK_BASEDOMAIN}
+      - DEFAULT_BASE_URL_REDIRECT=${SHLINK_DEFAULT_BASE_URL_REDIRECT}
       - GEOLITE_LICENSE_KEY=${SHLINK_GEOLITE_LICENSE_KEY}
       - DB_DRIVER=postgres
       - DB_NAME=shlink
@@ -81,12 +83,12 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.shlink_api.service=shlink_api"
-      - "traefik.http.routers.shlink_api.rule=Host(\"$SHLINK_API_SUBDOMAIN.$SHLINK_BASEDOMAIN\")"
-      - "traefik.http.routers.shlink_api.tls=true"
-      - "traefik.http.routers.shlink_api.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.shlink_api.entrypoints=websecure"
-      - "traefik.http.services.shlink_api.loadbalancer.server.port=8080"
+      - "traefik.http.routers.shlink_server.service=shlink_server"
+      - 'traefik.http.routers.shlink_server.rule=Host("$SHLINK_SERVER_HOST")'
+      - "traefik.http.routers.shlink_server.tls=true"
+      - "traefik.http.routers.shlink_server.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.shlink_server.entrypoints=websecure"
+      - "traefik.http.services.shlink_server.loadbalancer.server.port=8080"
     networks:
       - web_proxy
       - shlink

@@ -2,10 +2,11 @@ version: "3.9"
 
 services:
   gotify_db:
-    image: postgres:14
+    image: docker.io/library/postgres:15.4-alpine@sha256:d5260755faa5e967902b74b4b9bf9c6ade5c40ed9620b76a675c6bc2ec8160df
     restart: unless-stopped
     container_name: gotify_db
-    user: "${PUID}:${PGID}"
+    # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
+    # user: "${PUID}:${PGID}"
     volumes:
       - ./db:/var/lib/postgresql/data
     environment:
@@ -14,15 +15,21 @@ services:
       - POSTGRES_PASSWORD=${GOTIFY_DB_PASSWORD}
     networks:
       - gotify
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
   gotify_db_dumper:
-    image: paolobasso/database_dumper:postgres-14
+    image: docker.io/paolobasso/database_dumper:postgres-15
     restart: unless-stopped
     depends_on:
       - gotify_db
     container_name: gotify_db_dumper
     volumes:
-      - ./dumps:/dumps
+      - ./db_dumps:/dumps
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -35,7 +42,7 @@ services:
       - gotify
 
   gotify:
-    image: ghcr.io/gotify/server
+    image: docker.io/gotify/server:2.4.0@sha256:436a75a37795fed03df4d183c007b9d7d84329d4e92067121ff77f08e78cdadf
     depends_on:
       - gotify_db
     restart: unless-stopped
@@ -50,6 +57,7 @@ services:
       - "traefik.http.routers.gotify.tls=true"
       - "traefik.http.routers.gotify.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.gotify.entrypoints=websecure"
+      - 'traefik.http.routers.gotify.rule=Host("$GOTIFY_HOST")'
       - "traefik.http.services.gotify.loadbalancer.server.port=80"
     volumes:
       - ./data:/app/data

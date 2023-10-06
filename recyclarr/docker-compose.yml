@@ -2,12 +2,10 @@ version: "3.9"
 
 services:
   recyclarr:
-    image: ghcr.io/recyclarr/recyclarr:latest
+    image: ghcr.io/recyclarr/recyclarr:6.0.1@sha256:d1b2659f660c8491477d31cd554defdaccfcbfef1e62ad1516374903dc749a09
     container_name: recyclarr
+    user: ${PUID}:${PGID}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
       - SONARR_API_KEY=${SONARR_API_KEY}
       - RADARR_API_KEY=${RADARR_API_KEY}
     volumes:

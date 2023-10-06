@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   radarr:
-    image: ghcr.io/linuxserver/radarr:latest
+    image: docker.io/linuxserver/radarr:4.7.5@sha256:bbac3cfe4b6ffbef06f9f540133d5b8c569e9baa795c77c7f84b589c05050e35
     container_name: radarr
     environment:
       - PUID=${PUID}
@@ -10,8 +10,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ./config:/config
-      - /mnt/storagebox/downloads:/downloads:rw,rslave
-      - /mnt/storagebox/movies:/movies:rw,rslave
+      - ${RADARR_DOWNLOADS_PATH}:/downloads:rw,rslave
+      - ${RADARR_MOVIES_PATH}:/movies:rw,rslave
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -20,6 +20,7 @@ services:
       - "traefik.http.routers.radarr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.radarr.entrypoints=websecure"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+      - 'traefik.http.routers.radarr.rule=Host("$RADARR_HOST")'
       - "traefik.http.routers.radarr.middlewares=authelia@docker"
     networks:
       - web_proxy

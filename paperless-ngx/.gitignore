@@ -1,0 +1,9 @@
+db/*
+db_dumps/*
+data/*
+media/*
+export/*
+consume/*
+
+!**/.gitkeep
+

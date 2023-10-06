@@ -3,13 +3,13 @@ version: "3.9"
 services:
   traefik:
     container_name: traefik
-    image: traefik
+    image: docker.io/library/traefik:v2.10.4@sha256:6dc72608e3fc77ba57b4304e0543620df5d0e9f539a7c20cb3349f7e320bdbc1
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     environment:
-      - CF_API_EMAIL=${CLOUDFLARE_EMAIL}
-      - CF_API_KEY=${CLOUDFLARE_API_KEY}
+      - CF_API_EMAIL=${TRAEFIK_CF_API_EMAIL}
+      - CF_API_KEY=${TRAEFIK_CF_API_KEY}
     ports:
       - 80:80
       - 443:443
@@ -33,10 +33,10 @@ services:
       - --api.debug=false
       # Log
       - --log=true
-      - --log.level=WARN # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=${TRAEFIK_LOG_LEVEL} # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       # Certificate
       #      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server
-      - --certificatesResolvers.dns-cloudflare.acme.email=${CLOUDFLARE_EMAIL}
+      - --certificatesResolvers.dns-cloudflare.acme.email=${TRAEFIK_CF_API_EMAIL}
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       # Docker provider
@@ -45,7 +45,7 @@ services:
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=web_proxy
       - --providers.docker.swarmMode=false
-      - --providers.docker.defaultRule=Host("{{ index .Labels "com.docker.compose.service" }}.$DOMAIN")
+      - --providers.docker.defaultRule=Host("{{ index .Labels "com.docker.compose.service" }}.$TRAEFIK_DOMAIN")
       # Metrics
       - --entryPoints.metrics.address=:5043
       - --metrics=true
@@ -60,9 +60,9 @@ services:
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.rule=Host(\"$TRAEFIK_SUBDOMAIN.$DOMAIN\")"
+      - 'traefik.http.routers.traefik.rule=Host("$TRAEFIK_SUBDOMAIN.$TRAEFIK_DOMAIN")'
       # Redirect http to https
-      - "traefik.http.routers.http-catchall.rule=hostregexp(\"{host:.+}\")"
+      - 'traefik.http.routers.http-catchall.rule=hostregexp("{host:.+}")'
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -72,7 +72,7 @@ services:
       - "traefik.http.routers.traefik-metrics.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.traefik-metrics.entrypoints=websecure"
       - "traefik.http.services.traefik-metrics.loadbalancer.server.port=5043"
-      - "traefik.http.routers.traefik-metrics.rule=Host(\"$TRAEFIK_SUBDOMAIN.$DOMAIN\") && Path(\"/metrics\")"
+      - 'traefik.http.routers.traefik-metrics.rule=Host("$TRAEFIK_SUBDOMAIN.$TRAEFIK_DOMAIN") && Path("/metrics")'
       # Authelia
       - "traefik.http.routers.traefik.middlewares=authelia@docker"
       - "traefik.http.routers.traefik-metrics.middlewares=authelia-basic@docker"

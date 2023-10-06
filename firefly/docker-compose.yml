@@ -1,80 +1,91 @@
 version: "3.9"
 
 services:
-  firefly_db:
-    image: linuxserver/mariadb:10.5.13-alpine
-    container_name: firefly_db
+  firefly_iii_db:
+    image: docker.io/linuxserver/mariadb:10.11.5@sha256:3902a03363609ab2eb6da63e7d8ba5514f2cecbb5b7e1064efb130a80993c820
+    container_name: firefly_iii_db
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - MYSQL_ROOT_PASSWORD=${FIREFLY_DB_ROOT_PASSWORD}
-      - MYSQL_USER=firefly
-      - MYSQL_PASSWORD=${FIREFLY_DB_PASSWORD}
-      - MYSQL_DATABASE=firefly
+      - MYSQL_ROOT_PASSWORD=${FIREFLY_III_DB_ROOT_PASSWORD}
+      - MYSQL_USER=firefly_iii
+      - MYSQL_PASSWORD=${FIREFLY_III_DB_PASSWORD}
+      - MYSQL_DATABASE=firefly_iii
     volumes:
       - ./db:/config
     restart: unless-stopped
     networks:
-      - db
+      - firefly_iii
 
-  firefly_db_dumper:
-    image: paolobasso/database_dumper:mariadb
+  firefly_iii_db_dumper:
+    image: docker.io/paolobasso/database_dumper:mariadb
     restart: unless-stopped
     depends_on:
-      - firefly_db
-    container_name: firefly_db_dumper
+      - firefly_iii_db
+    container_name: firefly_iii_db_dumper
     volumes:
-      - ./dumps:/dumps
+      - ./db_dumps:/dumps
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_DATABASE=firefly
-      - DUMPER_HOST=firefly_db
-      - DUMPER_USER=firefly
-      - DUMPER_PASSWORD=${FIREFLY_DB_PASSWORD}
-      - DUMPER_HEALTHCHECKS_URL=${FIREFLY_DB_DUMPER_HEALTHCHECKS_URL}
+      - DUMPER_DATABASE=firefly_iii
+      - DUMPER_HOST=firefly_iii_db
+      - DUMPER_USER=firefly_iii
+      - DUMPER_PASSWORD=${FIREFLY_III_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${FIREFLY_III_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
-      - db
+      - firefly_iii
 
-  firefly:
-    image: fireflyiii/core:latest
-    container_name: firefly
+  firefly_iii:
+    image: docker.io/fireflyiii/core:version-6.0.26@sha256:547991babff2d11f729efd11fee3dcce20572ef4662081a8445cc73a88385150
+    container_name: firefly_iii
     depends_on:
-      - firefly_db
+      - firefly_iii_db
     environment:
       - TZ=${TZ}
-      - SITE_OWNER=${FIREFLY_OWNER_EMAIL}
-      - APP_KEY=${FIREFLY_APP_KEY}
+      - SITE_OWNER=${FIREFLY_III_OWNER_EMAIL}
+      - APP_KEY=${FIREFLY_III_APP_KEY}
       - DB_CONNECTION=mysql
-      - DB_HOST=firefly_db
+      - DB_HOST=firefly_iii_db
       - DB_PORT=3306
-      - DB_DATABASE=firefly
-      - DB_USERNAME=firefly
-      - DB_PASSWORD=${FIREFLY_DB_PASSWORD}
+      - DB_DATABASE=firefly_iii
+      - DB_USERNAME=firefly_iii
+      - DB_PASSWORD=${FIREFLY_III_DB_PASSWORD}
       - MAIL_MAILER=mailgun
-      - MAIL_FROM=${FIREFLY_MAIL_FROM}
-      - MAILGUN_DOMAIN=${FIREFLY_MAILGUN_DOMAIN}
-      - MAILGUN_SECRET=${FIREFLY_MAILGUN_SECRET}
-      - MAILGUN_ENDPOINT=${FIREFLY_MAILGUN_ENDPOINT}
-      - MAPBOX_API_KEY=${FIREFLY_MAPBOX_API_KEY}
+      - MAIL_FROM=${FIREFLY_III_MAIL_FROM}
+      - MAILGUN_DOMAIN=${FIREFLY_III_MAILGUN_DOMAIN}
+      - MAILGUN_SECRET=${FIREFLY_III_MAILGUN_SECRET}
+      - MAILGUN_ENDPOINT=${FIREFLY_III_MAILGUN_ENDPOINT}
+      - MAPBOX_API_KEY=${FIREFLY_III_MAPBOX_API_KEY}
       - TRUSTED_PROXIES=**
-      - APP_URL=${FIREFLY_APP_URL}
+      - APP_URL=https://${FIREFLY_III_HOST}
+      - STATIC_CRON_TOKEN=${FIREFLY_III_STATIC_CRON_TOKEN}
     volumes:
-      - ./export:/var/www/firefly-iii/storage/export
-      - ./upload:/var/www/firefly-iii/storage/upload
+      - ./upload:/var/www/html/storage/upload
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.firefly.service=firefly"
-      - "traefik.http.routers.firefly.tls=true"
-      - "traefik.http.routers.firefly.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.firefly.entrypoints=websecure"
-      - "traefik.http.services.firefly.loadbalancer.server.port=8080"
-      - "traefik.http.routers.firefly.middlewares=authelia@docker"
+      - "traefik.http.routers.firefly_iii.service=firefly_iii"
+      - "traefik.http.routers.firefly_iii.tls=true"
+      - "traefik.http.routers.firefly_iii.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.firefly_iii.entrypoints=websecure"
+      - "traefik.http.services.firefly_iii.loadbalancer.server.port=8080"
+      - 'traefik.http.routers.firefly_iii.rule=Host("$FIREFLY_III_HOST")'
+      - "traefik.http.routers.firefly_iii.middlewares=authelia@docker"
     networks:
       - web_proxy
-      - db
+      - firefly_iii
+
+  firefly_iii_cron:
+    image: docker.io/library/alpine:3.18.4@sha256:48d9183eb12a05c99bcc0bf44a003607b8e941e1d4f41f9ad12bdcc4b5672f86
+    restart: unless-stopped
+    depends_on:
+      - firefly_iii
+    container_name: firefly_iii_cron
+    command: sh -c "echo \"0 3 * * * wget -qO- http://firefly_iii:8080/api/v1/cron/${FIREFLY_III_STATIC_CRON_TOKEN}\" | crontab - && crond -f -L /dev/stdout"
+    networks:
+      - firefly_iii
 
 networks:
   web_proxy:

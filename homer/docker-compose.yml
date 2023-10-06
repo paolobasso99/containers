@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  homer:
+    image: docker.io/b4bz/homer:v23.09.1@sha256:f8bbf5127c4d6312b3490968ce7920c61c274b168a5c9127fbc4969dd540b81c
+    container_name: homer
+    volumes:
+      - ./assets:/www/assets
+    restart: unless-stopped
+    environment:
+      - HOMER_BASE_DOMAIN=${HOMER_BASE_DOMAIN}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homer.service=homer"
+      - "traefik.http.routers.homer.tls=true"
+      - "traefik.http.routers.homer.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.homer.entrypoints=websecure"
+      - "traefik.http.services.homer.loadbalancer.server.port=8080"
+      - 'traefik.http.routers.homer.rule=Host("$HOMR_HOST")'
+      - "traefik.http.routers.homer.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external:
+      name: web_proxy

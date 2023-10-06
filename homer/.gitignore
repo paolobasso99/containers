@@ -1,0 +1,4 @@
+assets/*
+!assets/config.yml
+
+!**/.gitkeep

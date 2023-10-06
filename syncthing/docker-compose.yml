@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   syncthing:
-    image: linuxserver/syncthing
+    image: docker.io/linuxserver/syncthing:1.25.0@sha256:bfa6bdf76c4a98d469fa0d68d5519401a24afe0f5e8295e8d51ce78e9245a78a
     container_name: syncthing
     environment:
       - PUID=${PUID}
@@ -10,9 +10,9 @@ services:
       - TZ=${TZ}
     volumes:
       - ./config:/config
-      - ${SYNCTHING_BASE_FOLDER}:/mnt/syncthing
+      - ${SYNCTHING_DATA_PATH}:/mnt/syncthing
     ports:
-      - 22000:22000
+      - ${SYNCTHING_PORT}:22000
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -21,6 +21,7 @@ services:
       - "traefik.http.routers.syncthing.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.syncthing.entrypoints=websecure"
       - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+      - 'traefik.http.routers.syncthing.rule=Host("$SYNCTHING_HOST")'
       - "traefik.http.routers.syncthing.middlewares=authelia@docker"
     networks:
       - web_proxy

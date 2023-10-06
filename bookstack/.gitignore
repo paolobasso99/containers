@@ -1,0 +1,5 @@
+db/*
+db_dumps/*
+config/*
+
+!**/.gitkeep

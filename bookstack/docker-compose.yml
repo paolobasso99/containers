@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   bookstack_db:
-    image: linuxserver/mariadb:10.5.13-alpine
+    image: docker.io/linuxserver/mariadb:10.11.5@sha256:3902a03363609ab2eb6da63e7d8ba5514f2cecbb5b7e1064efb130a80993c820
     container_name: bookstack_db
     environment:
       - PUID=${PUID}
@@ -16,16 +16,16 @@ services:
       - ./db:/config
     restart: unless-stopped
     networks:
-      - db
+      - bookstack
 
   bookstack_db_dumper:
-    image: paolobasso/database_dumper:mariadb
+    image: docker.io/paolobasso/database_dumper:mariadb
     restart: unless-stopped
     depends_on:
       - bookstack_db
     container_name: bookstack_db_dumper
     volumes:
-      - ./dumps:/dumps
+      - ./db_dumps:/dumps
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -35,10 +35,10 @@ services:
       - DUMPER_PASSWORD=${BOOKSTACK_DB_PASSWORD}
       - DUMPER_HEALTHCHECKS_URL=${BOOKSTACK_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
-      - db
+      - bookstack
 
   bookstack:
-    image: ghcr.io/linuxserver/bookstack
+    image: docker.io/linuxserver/bookstack:23.08.3@sha256:dc813afc5c53ea36d176d51238a6e74555b0ba2ebcb27ecee9c858f337c5b143
     container_name: bookstack
     depends_on:
       - bookstack_db
@@ -50,7 +50,7 @@ services:
       - DB_USER=bookstack
       - DB_PASS=${BOOKSTACK_DB_PASSWORD}
       - DB_DATABASE=bookstack
-      - APP_URL=${BOOKSTACK_URL}
+      - APP_URL=https://${BOOKSTACK_HOST}
     volumes:
       - ./config:/config
     restart: unless-stopped
@@ -60,13 +60,14 @@ services:
       - "traefik.http.routers.bookstack.tls=true"
       - "traefik.http.routers.bookstack.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.bookstack.entrypoints=websecure"
+      - 'traefik.http.routers.bookstack.rule=Host("$BOOKSTACK_HOST")'
       - "traefik.http.services.bookstack.loadbalancer.server.port=80"
     networks:
       - web_proxy
-      - db
+      - bookstack
 
 networks:
-  db:
+  bookstack:
     driver: bridge
   web_proxy:
     external: true

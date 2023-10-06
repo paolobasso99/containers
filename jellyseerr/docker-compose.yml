@@ -1,20 +1,27 @@
 version: "3.9"
 
 services:
-  recyclarr:
-    image: ghcr.io/recyclarr/recyclarr
-    container_name: recyclarr
-    user: ${PUID}:${PGID}
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+  jellyseerr:
+    image: docker.io/fallenbagel/jellyseerr:1.7.0@sha256:d6aec40a75672dca505ddfd9ea8ad20627e79cd0cada92c6e629ae2a0181a6d5
+    container_name: jellyseerr
     volumes:
       - ./config:/app/config
     restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyseerr.service=jellyseerr"
+      - "traefik.http.routers.jellyseerr.tls=true"
+      - "traefik.http.routers.jellyseerr.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.jellyseerr.entrypoints=websecure"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+      - 'traefik.http.routers.jellyseerr.rule=Host("$JELLYSEERR_HOST")'
+    # - "traefik.http.routers.jellyseerr.middlewares=authelia@docker"
     networks:
+      - web_proxy
       - torrent
 
 networks:
+  web_proxy:
+    external: true
   torrent:
     external: true

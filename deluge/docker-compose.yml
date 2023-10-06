@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   deluge:
-    image: binhex/arch-delugevpn:latest
+    image: docker.io/binhex/arch-delugevpn:2.1.1-4-04@sha256:d23477a27d878cfaa2572ff771b45921bf0786ba4eefff5f3aab340948535a85
     container_name: deluge
     environment:
       - PUID=${PUID}
@@ -12,8 +12,8 @@ services:
       - VPN_ENABLED=yes
       - VPN_PROV=custom
       - VPN_CLIENT=openvpn
-      - VPN_USER=${VPN_USER}
-      - VPN_PASS=${VPN_PASS}
+      - VPN_USER=${DELUGE_VPN_USER}
+      - VPN_PASS=${DELUGE_VPN_PASS}
       - ENABLE_PRIVOXY=no
       - LAN_NETWORK=192.168.1.0/24
       - NAME_SERVERS=84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1
@@ -23,7 +23,7 @@ services:
       - DEBUG=false
     volumes:
       - ./config:/config
-      - /mnt/storagebox/downloads:/downloads:rw,rslave
+      - ${DELUGE_DOWNLOADS_PATH}:/downloads:rw,rslave
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     cap_add:
@@ -32,19 +32,20 @@ services:
       - torrent
 
   deluge_proxy:
-    image: caddy:2-alpine
+    image: docker.io/library/caddy:2.7.4-alpine@sha256:3d1bf053476f2415b40e728c37e1112ee7551fa154a63d6f62b275c13fea8166
     restart: unless-stopped
     container_name: deluge_proxy
     command: caddy reverse-proxy --from :80 --to deluge:8112
     user: "${PUID}:${PGID}"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.plausible-proxy.service=plausible-proxy"
-      - 'traefik.http.routers.plausible-proxy.rule=Host("${DELUGE_HOST}")'
-      - "traefik.http.routers.plausible-proxy.tls=true"
-      - "traefik.http.routers.plausible-proxy.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.plausible-proxy.entrypoints=websecure"
-      - "traefik.http.services.plausible-proxy.loadbalancer.server.port=80"
+      - "traefik.http.routers.deluge_proxy.service=deluge_proxy"
+      - 'traefik.http.routers.deluge_proxy.rule=Host("${DELUGE_HOST}")'
+      - "traefik.http.routers.deluge_proxy.tls=true"
+      - "traefik.http.routers.deluge_proxy.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.deluge_proxy.entrypoints=websecure"
+      - "traefik.http.services.deluge_proxy.loadbalancer.server.port=80"
+      - "traefik.http.routers.deluge_proxy.middlewares=authelia@docker"
     networks:
       - torrent
       - web_proxy

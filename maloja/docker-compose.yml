@@ -2,12 +2,10 @@ version: "3.9"
 
 services:
   maloja:
-    image: krateng/maloja
+    image: docker.io/krateng/maloja:3.1.5@sha256:319800a9606860cc83e8343573b07bf6e7e07d6df260cdde48ae3501e2116ef7
     container_name: maloja
+    user: ${PUID}:${PGID}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
       - MALOJA_DATA_DIRECTORY=/mljdata
       - MALOJA_FORCE_PASSWORD=${MALOJA_FORCE_PASSWORD}
     volumes:
@@ -20,6 +18,7 @@ services:
       - "traefik.http.routers.maloja.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.maloja.entrypoints=websecure"
       - "traefik.http.services.maloja.loadbalancer.server.port=42010"
+      - 'traefik.http.routers.maloja.rule=Host("$MALOJA_HOST")'
       - "traefik.http.routers.maloja.middlewares=authelia@docker"
     networks:
       - web_proxy

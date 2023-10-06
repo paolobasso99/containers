@@ -2,20 +2,17 @@ version: "3.9"
 
 services:
   navidrome:
-    image: deluan/navidrome:latest
+    image: docker.io/deluan/navidrome:0.49.3@sha256:f8cc395b02f1e93e709e582c4b0f4dad8aa69b6a9a9c8df7af2beed74a7dff4f
     user: ${PUID}:${PGID}
     container_name: navidrome
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - ND_SCANSCHEDULE=1h
-      - ND_LOGLEVEL=info
-      - ND_SESSIONTIMEOUT=24h
-      - ND_LISTENBRAINZ_BASEURL=${ND_LISTENBRAINZ_BASEURL}
+      - ND_SCANSCHEDULE=${NAVIDROME_SCANCHEDULE}
+      - ND_LOGLEVEL=${NAVIDROME_LOGLEVEL}
+      - ND_SESSIONTIMEOUT=${NAVIDROME_SESSIONTIMEOUT}
+      - ND_LISTENBRAINZ_BASEURL=${NAVIDROME_LISTENBRAINZ_BASEURL}
     volumes:
       - ./data:/data
-      - /mnt/storagebox/music:/music:ro,rslave
+      - ${NAVIDROME_MUSIC_PATH}:/music:ro,rslave
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -24,6 +21,7 @@ services:
       - "traefik.http.routers.navidrome.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.navidrome.entrypoints=websecure"
       - "traefik.http.services.navidrome.loadbalancer.server.port=4533"
+      - 'traefik.http.routers.navidrome.rule=Host("$NAVIDROME_HOST")'
       - "traefik.http.routers.navidrome.middlewares=authelia@docker"
     networks:
       - web_proxy
