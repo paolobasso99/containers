@@ -16,12 +16,11 @@ services:
       - "traefik.http.routers.homer.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.homer.entrypoints=websecure"
       - "traefik.http.services.homer.loadbalancer.server.port=8080"
-      - 'traefik.http.routers.homer.rule=Host("$HOMR_HOST")'
+      - 'traefik.http.routers.homer.rule=Host("$HOMER_HOST")'
       - "traefik.http.routers.homer.middlewares=authelia@docker"
     networks:
       - web_proxy
 
 networks:
   web_proxy:
-    external:
-      name: web_proxy
+    external: true
