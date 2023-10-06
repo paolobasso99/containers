@@ -4,7 +4,7 @@
 # Config file for Radicale - A simple calendar server
 #
 # Place it into /etc/radicale/config (global)
-# or ~/.config/radicale/config (user)
+# or /.config/radicale/config (user)
 #
 # The current values are the default ones
 
@@ -65,7 +65,7 @@ hosts = 0.0.0.0:5232
 # Value: none | htpasswd | remote_user | http_x_remote_user
 type = htpasswd
 
-# Htpasswd filename, use: htpasswd -cbB users <USER> "<PASSWORD>"
+# Htpasswd filename
 htpasswd_filename = /config/users
 
 # Htpasswd encryption method
