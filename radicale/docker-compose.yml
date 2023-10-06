@@ -21,8 +21,6 @@ services:
       - ./data:/data
     environment:
       - TZ=${TZ}
-      - UID=${PUID}
-      - GID=${PGID}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.radicale.service=radicale"
