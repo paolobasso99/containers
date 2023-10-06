@@ -4,8 +4,9 @@ services:
   multi_scrobbler:
     image: ghcr.io/foxxmd/multi-scrobbler:0.6.0@sha256:f7aa0eec72b17aae798cedf4ff3c2bfd77af3e8ff781aa394ed0126e8d0dbd9b
     container_name: multi_scrobbler
-    user: ${PUID}:${PGID}
     environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
       - MALOJA_API_KEY=${MALOJA_API_KEY}
       - MALOJA_URL=${MALOJA_URL}
       - SPOTIFY_REDIRECT_URI=${SPOTIFY_REDIRECT_URI}
