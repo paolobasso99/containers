@@ -90,5 +90,5 @@ services:
 networks:
   web_proxy:
     external: true
-  db:
+  firefly_iii:
     driver: bridge
