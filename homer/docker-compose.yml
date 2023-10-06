@@ -7,8 +7,6 @@ services:
     volumes:
       - ./assets:/www/assets
     restart: unless-stopped
-    environment:
-      - HOMER_BASE_DOMAIN=${HOMER_BASE_DOMAIN}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homer.service=homer"
