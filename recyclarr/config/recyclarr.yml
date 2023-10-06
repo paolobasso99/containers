@@ -113,3 +113,4 @@ radarr:
         #    #reset_unmatched_scores: true # Optionally set other scores to 0 if they are not listed in 'names' above.
         quality_profiles:
             - name: HD-1080p
+
