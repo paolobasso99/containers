@@ -63,7 +63,7 @@ services:
       - paperless_ngx
 
   paperless_ngx_gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.9.2@sha256:8ec8163ea9ef8ebe0b6306ae6b1a313cf5c59a6084d2852ba3bbe8860a486ec1
+    image: docker.io/gotenberg/gotenberg:7.9.2@sha256:2e4fcccf5e065bf4d92b0b69c80776505e602dbfb11618c1c4e4e8be8a0630e9
     restart: unless-stopped
     container_name: paperless_ngx_gotenberg
     user: ${PUID}:${PGID}
