@@ -9,6 +9,7 @@ services:
       - ./data:/data
     environment:
       - ALLOWED_HOSTS=${HEALTHCHECKS_HOST}
+      - SITE_NAME=Healthchecks
       - REGISTRATION_OPEN=False
       - APPRISE_ENABLED=True
       - DB=sqlite
