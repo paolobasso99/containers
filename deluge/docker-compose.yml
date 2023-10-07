@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   deluge:
-    image: docker.io/binhex/arch-delugevpn:2.1.1-4-04@sha256:d23477a27d878cfaa2572ff771b45921bf0786ba4eefff5f3aab340948535a85
+    image: docker.io/binhex/arch-delugevpn:2.1.1-4-04@sha256:654610e9059002596db91ab46b40457aa1d12f429334e4dac9962f418c2019dd
     container_name: deluge
     environment:
       - PUID=${PUID}
