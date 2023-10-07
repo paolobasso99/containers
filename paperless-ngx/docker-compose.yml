@@ -46,9 +46,9 @@ services:
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
-      - DUMPER_DATABASE=paperless
+      - DUMPER_DATABASE=paperless_ngx
       - DUMPER_HOST=paperless_ngx_db
-      - DUMPER_USER=paperless
+      - DUMPER_USER=paperless_ngx
       - DUMPER_PASSWORD=${PAPERLESS_NGX_DB_PASSWORD}
       - DUMPER_HEALTHCHECKS_URL=${PAPERLESS_NGX_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
@@ -97,7 +97,8 @@ services:
       - PAPERLESS_REDIS=redis://paperless_ngx_redis:6379
       - PAPERLESS_DBHOST=paperless_ngx_db
       - PAPERLESS_DBPORT=5432
-      - PAPERLESS_DBUSER=paperless
+      - PAPERLESS_DBUSER=paperless_ngx
+      - PAPERLESS_DBNAME=paperless_ngx
       - PAPERLESS_DBPASS=${PAPERLESS_NGX_DB_PASSWORD}
       - PAPERLESS_TIKA_ENABLED=1
       - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://paperless_ngx_gotenberg:3000
@@ -116,8 +117,8 @@ services:
       - "traefik.http.routers.paperless_ngx.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.paperless_ngx.entrypoints=websecure"
       - "traefik.http.services.paperless_ngx.loadbalancer.server.port=8000"
+      - 'traefik.http.routers.paperless_ngx.rule=Host("$PAPERLESS_NGX_HOST")'
       - "traefik.http.routers.paperless_ngx.middlewares=authelia@docker"
-      - 'traefik.http.routers.papeless_ngx.rule=Host("$PAPERLESS_NGX_HOST")'
     networks:
       - paperless_ngx
       - web_proxy
@@ -146,6 +147,7 @@ services:
       - "traefik.http.routers.paperless_ngx_webdav.entrypoints=websecure"
       - "traefik.http.services.paperless_ngx_webdav.loadbalancer.server.port=80"
       - "traefik.http.routers.paperless_ngx_webdav.middlewares=authelia-basic@docker"
+      - 'traefik.http.routers.paperless_ngx_webdav.rule=Host("$PAPERLESS_NGX_WEBDAV_HOST")'
     networks:
       - web_proxy
 
