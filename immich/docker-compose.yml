@@ -36,7 +36,7 @@ services:
       - DUMPER_DATABASE=immich
       - DUMPER_HOST=immich_db
       - DUMPER_USER=immich
-      - DUMPER_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+      - DUMPER_PASSWORD=${IMMICH_DB_PASSWORD}
       - DUMPER_HEALTHCHECKS_URL=${IMMICH_DB_DUMPER_HEALTHCHECKS_URL}
     networks:
       - immich
@@ -53,7 +53,7 @@ services:
       - IMMICH_MACHINE_LEARNING_ENABLED=false
       - DB_HOSTNAME=immich_db
       - DB_USERNAME=immich
-      - DB_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
       - DB_DATABASE_NAME=immich
       - DB_PORT=5432
       - REDIS_HOSTNAME=immich_redis
@@ -90,7 +90,7 @@ services:
       - IMMICH_MACHINE_LEARNING_ENABLED=false
       - DB_HOSTNAME=immich_db
       - DB_USERNAME=immich
-      - DB_PASSWORD=${IMMICH_DATABASE_PASSWORD}
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
       - DB_DATABASE_NAME=immich
       - DB_PORT=5432
       - REDIS_HOSTNAME=immich_redis
