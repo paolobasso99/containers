@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  healthchecks:
+    image: docker.io/healthchecks/healthchecks:v2.9.2@sha256:9707069cc95dde61284cbd3facd7c919c871ff786f31d2265e74c2cff3abdba6
+    container_name: healthchecks
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./data:/data
+    environment:
+      - ALLOWED_HOSTS=${HEALTHCHECKS_HOST}
+      - REGISTRATION_OPEN=False
+      - APPRISE_ENABLED=True
+      - DB=sqlite
+      - DB_NAME=/data/hc.sqlite
+      - DEBUG=False
+      - DEFAULT_FROM_EMAIL=${HEALTHCHECKS_DEFAULT_FROM_EMAIL}
+      - EMAIL_HOST=${HEALTHCHECKS_EMAIL_HOST}
+      - EMAIL_HOST_PASSWORD=${HEALTHCHECKS_EMAIL_HOST_PASSWORD}
+      - EMAIL_HOST_USER=${HEALTHCHECKS_EMAIL_HOST_USER}
+      - EMAIL_PORT=${HEALTHCHECKS_EMAIL_PORT}
+      - EMAIL_USE_TLS=${HEALTHCHECKS_EMAIL_USE_TLS}
+      - SECRET_KEY=${HEALTHCHECKS_SECRET_KEY}
+      - SITE_ROOT=http://${HEALTHCHECKS_HOST}
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.healthchecks.service=healthchecks"
+      - "traefik.http.routers.healthchecks.tls=true"
+      - "traefik.http.routers.healthchecks.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.healthchecks.entrypoints=websecure"
+      - "traefik.http.services.healthchecks.loadbalancer.server.port=8000"
+      - 'traefik.http.routers.healthchecks.rule=Host("$HEALTHCHECKS_HOST")'
+      - "traefik.http.routers.healthchecks.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external: true
+
