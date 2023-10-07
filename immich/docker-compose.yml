@@ -48,7 +48,6 @@ services:
     depends_on:
       - immich_db
       - immich_redis
-      - immich_typesense
     environment:
       - IMMICH_MACHINE_LEARNING_ENABLED=false
       - DB_HOSTNAME=immich_db
@@ -58,9 +57,7 @@ services:
       - DB_PORT=5432
       - REDIS_HOSTNAME=immich_redis
       - REDIS_PORT=6379
-      - TYPESENSE_HOSTNAME=immich_typesense
-      - TYPESENSE_PORT=8108
-      - TYPESENSE_API_KEY=${IMMICH_TYPESENSE_API_KEY}
+      - TYPESENSE_ENABLED=false
     volumes:
       - ${IMMICH_UPLOAD_PATH}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -95,20 +92,21 @@ services:
       - DB_PORT=5432
       - REDIS_HOSTNAME=immich_redis
       - REDIS_PORT=6379
-      - TYPESENSE_HOSTNAME=immich_typesense
-      - TYPESENSE_PORT=8108
-      - TYPESENSE_API_KEY=${IMMICH_TYPESENSE_API_KEY}
+      - TYPESENSE_ENABLED=false
     depends_on:
       - immich_db
       - immich_redis
-      - immich_typesense
     restart: unless-stopped
     networks:
       - immich
 
-  immich_proxy:
-    container_name: immich_proxy
-    image: ghcr.io/immich-app/immich-proxy:v1.81.1@sha256:6417a54f2c9661baba425e318a3933fa7548a08c5a2cce79c5e4da47dc36e7f9
+  immich_web:
+    container_name: immich_web
+    image: ghcr.io/immich-app/immich-web:v1.81.1@sha256:93ec1c8012da4454aa91a29e37d61c67660d2319f610a582998f7cfe2c816cea
+    depends_on:
+      - immich_server
+      - immich_redis
+      - immich_db
     environment:
       - IMMICH_SERVER_URL=http://immich_server:3001
       - PUBLIC_IMMICH_SERVER_URL=http://immich_server:3001
@@ -116,13 +114,13 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.immich_proxy.service=immich_proxy"
-      - "traefik.http.routers.immich_proxy.tls=true"
-      - "traefik.http.routers.immich_proxy.tls.certresolver=dns-cloudflare"
-      - "traefik.http.routers.immich_proxy.entrypoints=websecure"
-      - "traefik.http.routers.immich_proxy.rule=Host(`${IMMICH_HOST}`)"
-      - "traefik.http.services.immich_proxy.loadbalancer.server.port=3000"
-      - "traefik.http.routers.immich_proxy.middlewares=authelia@docker"
+      - "traefik.http.routers.immich_web.service=immich_web"
+      - "traefik.http.routers.immich_web.tls=true"
+      - "traefik.http.routers.immich_web.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.immich_web.entrypoints=websecure"
+      - "traefik.http.routers.immich_web.rule=Host(`${IMMICH_HOST}`)"
+      - "traefik.http.services.immich_web.loadbalancer.server.port=3000"
+      - "traefik.http.routers.immich_web.middlewares=authelia@docker"
     networks:
       - immich
       - web_proxy
@@ -139,20 +137,6 @@ services:
       interval: 30s
       retries: 5
       timeout: 3s
-
-  immich_typesense:
-    container_name: immich_typesense
-    image: docker.io/typesense/typesense:0.25.1@sha256:3724f68156097114d07790e1c8bfaaca13b12eaecd602776d30d9933029064c7
-    restart: unless-stopped
-    volumes:
-      - ./typesense:/data
-    environment:
-      - TYPESENSE_API_KEY=${IMMICH_TYPESENSE_API_KEY}
-      - TYPESENSE_DATA_DIR=/data
-      # remove this to get debug messages
-      - GLOG_minloglevel=1
-    networks:
-      - immich
 
 networks:
   web_proxy:
