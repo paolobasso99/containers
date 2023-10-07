@@ -22,7 +22,7 @@ services:
       - EMAIL_PORT=${HEALTHCHECKS_EMAIL_PORT}
       - EMAIL_USE_TLS=${HEALTHCHECKS_EMAIL_USE_TLS}
       - SECRET_KEY=${HEALTHCHECKS_SECRET_KEY}
-      - SITE_ROOT=http://${HEALTHCHECKS_HOST}
+      - SITE_ROOT=https://${HEALTHCHECKS_HOST}
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
