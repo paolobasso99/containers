@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   radarr:
-    image: docker.io/linuxserver/radarr:4.7.5@sha256:bbac3cfe4b6ffbef06f9f540133d5b8c569e9baa795c77c7f84b589c05050e35
+    image: docker.io/linuxserver/radarr:4.7.5@sha256:a7e8acff3f429351d2dfa1c887d751d13b8e974cd423841ed52be4203a4b1941
     container_name: radarr
     environment:
       - PUID=${PUID}
