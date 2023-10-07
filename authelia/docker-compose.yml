@@ -79,7 +79,6 @@ services:
       - AUTHELIA_STORAGE_POSTGRES_PORT=5432
       - AUTHELIA_STORAGE_POSTGRES_DATABASE=authelia
       - AUTHELIA_STORAGE_POSTGRES_USERNAME=authelia
-      - AUTHELIA_STORAGE_POSTGRES_SSLMODE=disable
       # Notifier
       - AUTHELIA_NOTIFIER_SMTP_USERNAME=${AUTHELIA_NOTIFIER_SMTP_USERNAME}
       - AUTHELIA_NOTIFIER_SMTP_PASSWORD=${AUTHELIA_NOTIFIER_SMTP_PASSWORD}
@@ -93,12 +92,6 @@ services:
       - "traefik.http.routers.authelia.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.authelia.entrypoints=websecure"
       - "traefik.http.services.authelia.loadbalancer.server.port=9091"
-      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://$AUTHELIA_HOST"
-      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
-      - "traefik.http.middlewares.authelia-basic.forwardauth.address=http://authelia:9091/api/verify?auth=basic"
-      - "traefik.http.middlewares.authelia-basic.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.authelia-basic.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
       # Authelia headers, see https://www.authelia.com/docs/security/measures.html#traefik-2x---docker-compose
       - "traefik.http.routers.authelia.middlewares=authelia-headers"
       - "traefik.http.middlewares.authelia-headers.headers.browserXssFilter=true"

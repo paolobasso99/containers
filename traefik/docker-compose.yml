@@ -73,7 +73,14 @@ services:
       - "traefik.http.routers.traefik-metrics.entrypoints=websecure"
       - "traefik.http.services.traefik-metrics.loadbalancer.server.port=5043"
       - 'traefik.http.routers.traefik-metrics.rule=Host("$TRAEFIK_SUBDOMAIN.$TRAEFIK_DOMAIN") && Path("/metrics")'
-      # Authelia
+      # Authelia middlewares
+      - "traefik.http.middlewares.authelia.forwardauth.address=$TRAEFIK_AUTHELIA_VERIFY_URL?rd=https://$TRAEFIK_AUTHELIA_HOST"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
+      - "traefik.http.middlewares.authelia-basic.forwardauth.address=$TRAEFIK_AUTHELIA_VERIFY_URL?auth=basic"
+      - "traefik.http.middlewares.authelia-basic.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia-basic.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
+      # Protect dashboard and metrics with Authelia
       - "traefik.http.routers.traefik.middlewares=authelia@docker"
       - "traefik.http.routers.traefik-metrics.middlewares=authelia-basic@docker"
 
