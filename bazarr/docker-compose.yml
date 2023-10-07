@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   bazarr:
-    image: docker.io/linuxserver/bazarr:1.3.0@sha256:99aa02543dee5c896ea1b95e952a01331e822975cbd4c234fb20ef447b591c66
+    image: docker.io/linuxserver/bazarr:1.3.0@sha256:48498977e457a3b5b9134e29ae83c70caa18a2c07828942c1b2d2c381f7d4b26
     container_name: bazarr
     environment:
       - PUID=${PUID}
