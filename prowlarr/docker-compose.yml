@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   prowlarr:
-    image: docker.io/linuxserver/prowlarr:1.8.6@sha256:5fd3d908378e3b35da0541251cf702a6027df2ba98f3a0555dcd7337ee7a0d0d
+    image: docker.io/linuxserver/prowlarr:1.8.1259@sha256:76f6e8528e85ae295fcdc98e7b60f4a83cef2570ab13cd0e360fe4fd1cc21e43
     container_name: prowlarr
     environment:
       - PUID=${PUID}
