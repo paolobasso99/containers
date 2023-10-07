@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  uptime_kuma:
+    image: docker.io/louislam/uptime-kuma:1.23.2-alpine@sha256:88d5e6434f4dde9cbeb2525a7fa7f4eea6ec4cfd9845f34d9b77b4d7b7485329
+    container_name: uptime_kuma
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.uptime_kuma.service=uptime_kuma"
+      - "traefik.http.routers.uptime_kuma.tls=true"
+      - "traefik.http.routers.uptime_kuma.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.uptime_kuma.entrypoints=websecure"
+      - "traefik.http.services.uptime_kuma.loadbalancer.server.port=3001"
+      - 'traefik.http.routers.uptime_kuma.rule=Host("$UPTIME_KUMA_HOST")'
+      - "traefik.http.routers.uptime_kuma.middlewares=authelia@docker"
+    networks:
+      - web_proxy
+
+networks:
+  web_proxy:
+    external: true
