@@ -64,7 +64,7 @@ services:
       - web_proxy
 
   shlink_server:
-    image: docker.io/shlinkio/shlink:3.6.4-non-root@sha256:ce4d35abf245e99a9d7330d3350238adc9cb8136fbd24c269f6da1d272bd22d4
+    image: docker.io/shlinkio/shlink:3.6.4-non-root@sha256:3c6ca9c9aec1ac98fd3ca61250d77e384a824326d4ecde688b1e521d593fc9da
     container_name: shlink_server
     depends_on:
       - shlink_db
