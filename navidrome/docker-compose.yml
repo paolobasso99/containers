@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   navidrome:
-    image: docker.io/deluan/navidrome:0.49.3@sha256:f8cc395b02f1e93e709e582c4b0f4dad8aa69b6a9a9c8df7af2beed74a7dff4f
+    image: docker.io/deluan/navidrome:0.49.3@sha256:11a24da08977ebfa4a9a71f8c878d822ffaae74a019f274a75dc6386d523da86
     user: ${PUID}:${PGID}
     container_name: navidrome
     environment:
