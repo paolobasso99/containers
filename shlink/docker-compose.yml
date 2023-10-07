@@ -42,9 +42,8 @@ services:
       - shlink
 
   shlink_client:
-    image: docker.io/shlinkio/shlink-web-client:3.10.2@sha256:4f8224d9b197def458da4a6dc9c9cd15bf033ac2a15ca368336a8bd911c394e9
+    image: docker.io/shlinkio/shlink-web-client:3.10.2@sha256:f6630fd6d2ad922385bf436d7f2988eefbfbaa6c59456d59adb2f349ed6ebb90
     container_name: shlink_client
-    user: ${PUID}:${PGID}
     depends_on:
       - shlink_db
       - shlink_server
@@ -65,9 +64,8 @@ services:
       - web_proxy
 
   shlink_server:
-    image: docker.io/shlinkio/shlink:3.6.4@sha256:c57a417966c2464b0886423ad789e2d581cc7c1f97434a63697f1a13fe00dc4a
+    image: docker.io/shlinkio/shlink:3.6.4-non-root@sha256:ce4d35abf245e99a9d7330d3350238adc9cb8136fbd24c269f6da1d272bd22d4
     container_name: shlink_server
-    user: ${PUID}:${PGID}
     depends_on:
       - shlink_db
     environment:
