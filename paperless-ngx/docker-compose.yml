@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
     container_name: papeless_ngx_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
-    # user: "${PUID}:${PGID}"
+    user: "${PUID}:${PGID}"
     volumes:
       - ./db:/var/lib/postgresql/data
     environment:
