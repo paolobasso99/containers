@@ -32,6 +32,7 @@ services:
       - "traefik.http.routers.healthchecks.entrypoints=websecure"
       - "traefik.http.services.healthchecks.loadbalancer.server.port=8000"
       - 'traefik.http.routers.healthchecks.rule=Host("$HEALTHCHECKS_HOST")'
+      - "traefik.http.routers.healthchecks.middlewares=authelia@docker"
     networks:
       - web_proxy
 
