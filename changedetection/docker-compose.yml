@@ -29,7 +29,7 @@ services:
 
   changedetection_playwright:
     container_name: changedetection_playwright
-    image: docker.io/browserless/chrome:1.60.2-chrome-stable@sha256:ce5d222a3c9a4c922502908e7ed732b2e553b3da5c7de154a2f0cd24fb8ed057
+    image: docker.io/browserless/chrome:1.60.2-chrome-stable@sha256:7db5e3aad20c201abaa03bbbc868a55ef96574cda0e67ccb7e4e032053ecb87d
     restart: unless-stopped
     environment:
       - SCREEN_WIDTH=1920
