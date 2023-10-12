@@ -32,7 +32,7 @@ services:
       - torrent
 
   deluge_proxy:
-    image: docker.io/library/caddy:2.7.4-alpine@sha256:11ae052d9015105757d19caf86dc51fc14403841f2b65e93fe320f4d0e197385
+    image: docker.io/library/caddy:2.7.5-alpine@sha256:b6f72113f4565450be796b727c971cd9a863f06af987c6521fbe403028de93da
     restart: unless-stopped
     container_name: deluge_proxy
     command: caddy reverse-proxy --from :80 --to deluge:8112
