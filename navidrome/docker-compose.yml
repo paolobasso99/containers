@@ -16,11 +16,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.navidrome.loadbalancer.server.port=4533"
       - "traefik.http.routers.navidrome.service=navidrome"
       - "traefik.http.routers.navidrome.tls=true"
-      - "traefik.http.routers.navidrome.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.navidrome.entrypoints=websecure"
-      - "traefik.http.services.navidrome.loadbalancer.server.port=4533"
       - 'traefik.http.routers.navidrome.rule=Host("$NAVIDROME_HOST")'
       - "traefik.http.routers.navidrome.middlewares=authelia@docker"
     networks:

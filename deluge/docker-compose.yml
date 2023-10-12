@@ -39,12 +39,11 @@ services:
     user: "${PUID}:${PGID}"
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.deluge_proxy.loadbalancer.server.port=80"
       - "traefik.http.routers.deluge_proxy.service=deluge_proxy"
       - 'traefik.http.routers.deluge_proxy.rule=Host("${DELUGE_HOST}")'
       - "traefik.http.routers.deluge_proxy.tls=true"
-      - "traefik.http.routers.deluge_proxy.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.deluge_proxy.entrypoints=websecure"
-      - "traefik.http.services.deluge_proxy.loadbalancer.server.port=80"
       - "traefik.http.routers.deluge_proxy.middlewares=authelia@docker"
     networks:
       - torrent

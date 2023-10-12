@@ -53,13 +53,12 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.shlink_client.middlewares=authelia@docker"
       - "traefik.http.routers.shlink_client.service=shlink_client"
       - 'traefik.http.routers.shlink_client.rule=Host("$SHLINK_CLIENT_HOST")'
       - "traefik.http.routers.shlink_client.tls=true"
-      - "traefik.http.routers.shlink_client.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.shlink_client.entrypoints=websecure"
       - "traefik.http.services.shlink_client.loadbalancer.server.port=80"
-      - "traefik.http.routers.shlink_client.middlewares=authelia@docker"
     networks:
       - web_proxy
 
@@ -81,12 +80,11 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.shlink_server.loadbalancer.server.port=8080"
       - "traefik.http.routers.shlink_server.service=shlink_server"
       - 'traefik.http.routers.shlink_server.rule=Host("$SHLINK_SERVER_HOST")'
       - "traefik.http.routers.shlink_server.tls=true"
-      - "traefik.http.routers.shlink_server.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.shlink_server.entrypoints=websecure"
-      - "traefik.http.services.shlink_server.loadbalancer.server.port=8080"
     networks:
       - web_proxy
       - shlink

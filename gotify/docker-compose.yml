@@ -53,12 +53,11 @@ services:
       - GOTIFY_DATABASE_CONNECTION=host=gotify_db port=5432 user=gotify dbname=gotify password=${GOTIFY_DB_PASSWORD} sslmode=disable
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.gotify.loadbalancer.server.port=80"
       - "traefik.http.routers.gotify.service=gotify"
       - "traefik.http.routers.gotify.tls=true"
-      - "traefik.http.routers.gotify.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.gotify.entrypoints=websecure"
       - 'traefik.http.routers.gotify.rule=Host("$GOTIFY_HOST")'
-      - "traefik.http.services.gotify.loadbalancer.server.port=80"
     volumes:
       - ./data:/app/data
     networks:

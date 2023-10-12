@@ -15,11 +15,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
       - "traefik.http.routers.bazarr.service=bazarr"
       - "traefik.http.routers.bazarr.tls=true"
-      - "traefik.http.routers.bazarr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.bazarr.entrypoints=websecure"
-      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
       - 'traefik.http.routers.bazarr.rule=Host("$BAZARR_HOST")'
       - "traefik.http.routers.bazarr.middlewares=authelia@docker"
     networks:

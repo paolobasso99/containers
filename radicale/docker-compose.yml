@@ -23,11 +23,10 @@ services:
       - TZ=${TZ}
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.radicale.loadbalancer.server.port=5232"
       - "traefik.http.routers.radicale.service=radicale"
       - "traefik.http.routers.radicale.tls=true"
-      - "traefik.http.routers.radicale.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.radicale.entrypoints=websecure"
-      - "traefik.http.services.radicale.loadbalancer.server.port=5232"
       - 'traefik.http.routers.radicale.rule=Host("$RADICALE_HOST")'
     networks:
       - web_proxy

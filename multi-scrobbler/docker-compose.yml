@@ -17,11 +17,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.multi_scrobbler.loadbalancer.server.port=9078"
       - "traefik.http.routers.multi_scrobbler.service=multi_scrobbler"
       - "traefik.http.routers.multi_scrobbler.tls=true"
-      - "traefik.http.routers.multi_scrobbler.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.multi_scrobbler.entrypoints=websecure"
-      - "traefik.http.services.multi_scrobbler.loadbalancer.server.port=9078"
       - 'traefik.http.routers.multi_scrobbler.rule=Host("$MULTI_SCROBBLER_HOST")'
       - "traefik.http.routers.multi_scrobbler.middlewares=authelia@docker"
     networks:

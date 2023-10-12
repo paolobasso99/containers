@@ -15,11 +15,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
       - "traefik.http.routers.sonarr.service=sonarr"
       - "traefik.http.routers.sonarr.tls=true"
-      - "traefik.http.routers.sonarr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.sonarr.entrypoints=websecure"
-      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
       - 'traefik.http.routers.sonarr.rule=Host("$SONARR_HOST")'
       - "traefik.http.routers.sonarr.middlewares=authelia@docker"
     networks:

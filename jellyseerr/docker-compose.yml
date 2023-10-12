@@ -9,11 +9,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
       - "traefik.http.routers.jellyseerr.service=jellyseerr"
       - "traefik.http.routers.jellyseerr.tls=true"
-      - "traefik.http.routers.jellyseerr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.jellyseerr.entrypoints=websecure"
-      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
       - 'traefik.http.routers.jellyseerr.rule=Host("$JELLYSEERR_HOST")'
     # - "traefik.http.routers.jellyseerr.middlewares=authelia@docker"
     networks:

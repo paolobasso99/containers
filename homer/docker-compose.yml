@@ -9,11 +9,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.homer.loadbalancer.server.port=8080"
       - "traefik.http.routers.homer.service=homer"
       - "traefik.http.routers.homer.tls=true"
-      - "traefik.http.routers.homer.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.homer.entrypoints=websecure"
-      - "traefik.http.services.homer.loadbalancer.server.port=8080"
       - 'traefik.http.routers.homer.rule=Host("$HOMER_HOST")'
       - "traefik.http.routers.homer.middlewares=authelia@docker"
     networks:

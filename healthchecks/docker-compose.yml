@@ -26,11 +26,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.healthchecks.loadbalancer.server.port=8000"
       - "traefik.http.routers.healthchecks.service=healthchecks"
       - "traefik.http.routers.healthchecks.tls=true"
-      - "traefik.http.routers.healthchecks.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.healthchecks.entrypoints=websecure"
-      - "traefik.http.services.healthchecks.loadbalancer.server.port=8000"
       - 'traefik.http.routers.healthchecks.rule=Host("$HEALTHCHECKS_HOST")'
       - "traefik.http.routers.healthchecks.middlewares=authelia@docker"
     networks:

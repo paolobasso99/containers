@@ -16,12 +16,11 @@ services:
       - ./datastore:/datastore
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.changedetection.loadbalancer.server.port=5000"
       - "traefik.http.routers.changedetection.service=changedetection"
       - 'traefik.http.routers.changedetection.rule=Host("$CHANGEDETECTION_HOST")'
       - "traefik.http.routers.changedetection.tls=true"
-      - "traefik.http.routers.changedetection.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.changedetection.entrypoints=websecure"
-      - "traefik.http.services.changedetection.loadbalancer.server.port=5000"
       - "traefik.http.routers.changedetection.middlewares=authelia@docker"
     networks:
       - web_proxy

@@ -16,11 +16,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
       - "traefik.http.routers.syncthing.service=syncthing"
       - "traefik.http.routers.syncthing.tls=true"
-      - "traefik.http.routers.syncthing.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.syncthing.entrypoints=websecure"
-      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
       - 'traefik.http.routers.syncthing.rule=Host("$SYNCTHING_HOST")'
       - "traefik.http.routers.syncthing.middlewares=authelia@docker"
     networks:

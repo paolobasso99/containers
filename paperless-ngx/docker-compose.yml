@@ -112,11 +112,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.paperless_ngx.loadbalancer.server.port=8000"
       - "traefik.http.routers.paperless_ngx.service=paperless_ngx"
       - "traefik.http.routers.paperless_ngx.tls=true"
-      - "traefik.http.routers.paperless_ngx.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.paperless_ngx.entrypoints=websecure"
-      - "traefik.http.services.paperless_ngx.loadbalancer.server.port=8000"
       - 'traefik.http.routers.paperless_ngx.rule=Host("$PAPERLESS_NGX_HOST")'
       - "traefik.http.routers.paperless_ngx.middlewares=authelia@docker"
     networks:
@@ -141,11 +140,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.paperless_ngx_webdav.loadbalancer.server.port=80"
       - "traefik.http.routers.paperless_ngx_webdav.service=paperless_ngx_webdav"
       - "traefik.http.routers.paperless_ngx_webdav.tls=true"
-      - "traefik.http.routers.paperless_ngx_webdav.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.paperless_ngx_webdav.entrypoints=websecure"
-      - "traefik.http.services.paperless_ngx_webdav.loadbalancer.server.port=80"
       - "traefik.http.routers.paperless_ngx_webdav.middlewares=authelia-basic@docker"
       - 'traefik.http.routers.paperless_ngx_webdav.rule=Host("$PAPERLESS_NGX_WEBDAV_HOST")'
     networks:

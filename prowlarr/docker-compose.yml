@@ -13,11 +13,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
       - "traefik.http.routers.prowlarr.service=prowlarr"
       - "traefik.http.routers.prowlarr.tls=true"
-      - "traefik.http.routers.prowlarr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.prowlarr.entrypoints=websecure"
-      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
       - 'traefik.http.routers.prowlarr.rule=Host("$PROWLARR_HOST")'
       - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
     networks:

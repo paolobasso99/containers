@@ -66,11 +66,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.firefly_iii.loadbalancer.server.port=8080"
       - "traefik.http.routers.firefly_iii.service=firefly_iii"
       - "traefik.http.routers.firefly_iii.tls=true"
-      - "traefik.http.routers.firefly_iii.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.firefly_iii.entrypoints=websecure"
-      - "traefik.http.services.firefly_iii.loadbalancer.server.port=8080"
       - 'traefik.http.routers.firefly_iii.rule=Host("$FIREFLY_III_HOST")'
       - "traefik.http.routers.firefly_iii.middlewares=authelia@docker"
     networks:

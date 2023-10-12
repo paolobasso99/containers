@@ -13,11 +13,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.maloja.loadbalancer.server.port=42010"
       - "traefik.http.routers.maloja.service=maloja"
       - "traefik.http.routers.maloja.tls=true"
-      - "traefik.http.routers.maloja.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.maloja.entrypoints=websecure"
-      - "traefik.http.services.maloja.loadbalancer.server.port=42010"
       - 'traefik.http.routers.maloja.rule=Host("$MALOJA_HOST")'
       - "traefik.http.routers.maloja.middlewares=authelia@docker"
     networks:

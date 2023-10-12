@@ -11,7 +11,7 @@ services:
       - CF_API_EMAIL=${TRAEFIK_CF_API_EMAIL}
       - CF_API_KEY=${TRAEFIK_CF_API_KEY}
     ports:
-      - 80:80
+      # - 80:80
       - 443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -24,7 +24,7 @@ services:
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=false
       # Entrypoints
-      - --entryPoints.web.address=:80
+      # - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
       # Dashboard
       - --api=true
@@ -61,11 +61,14 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - 'traefik.http.routers.traefik.rule=Host("$TRAEFIK_SUBDOMAIN.$TRAEFIK_DOMAIN")'
+      # Certificates
+      - "traefik.http.routers.traefik.tls.domains[0].main=$TRAEFIK_DOMAIN"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.$TRAEFIK_DOMAIN"
       # Redirect http to https
-      - 'traefik.http.routers.http-catchall.rule=hostregexp("{host:.+}")'
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # - 'traefik.http.routers.http-catchall.rule=hostregexp("{host:.+}")'
+      # - "traefik.http.routers.http-catchall.entrypoints=web"
+      # - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # Metrics
       - "traefik.http.routers.traefik-metrics.service=traefik-metrics"
       - "traefik.http.routers.traefik-metrics.tls=true"

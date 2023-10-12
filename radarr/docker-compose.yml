@@ -15,11 +15,10 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
       - "traefik.http.routers.radarr.service=radarr"
       - "traefik.http.routers.radarr.tls=true"
-      - "traefik.http.routers.radarr.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.radarr.entrypoints=websecure"
-      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
       - 'traefik.http.routers.radarr.rule=Host("$RADARR_HOST")'
       - "traefik.http.routers.radarr.middlewares=authelia@docker"
     networks:

@@ -87,11 +87,10 @@ services:
       - AUTHELIA_NOTIFIER_SMTP_HOST=${AUTHELIA_NOTIFIER_SMTP_HOST}
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
       - 'traefik.http.routers.authelia.rule=Host("$AUTHELIA_HOST")'
       - "traefik.http.routers.authelia.tls=true"
-      - "traefik.http.routers.authelia.tls.certresolver=dns-cloudflare"
       - "traefik.http.routers.authelia.entrypoints=websecure"
-      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
       # Authelia headers, see https://www.authelia.com/docs/security/measures.html#traefik-2x---docker-compose
       - "traefik.http.routers.authelia.middlewares=authelia-headers"
       - "traefik.http.middlewares.authelia-headers.headers.browserXssFilter=true"
