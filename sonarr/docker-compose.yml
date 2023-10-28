@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   sonarr:
-    image: docker.io/linuxserver/sonarr:version-3.0.10.1567@sha256:99fa4d2b68092d0ccad0e133bcbed96f36cff19fa24f0592340f005aa0971da0
+    image: docker.io/linuxserver/sonarr:version-3.0.10.1567@sha256:7a56eff1567eb46dee4710c5d742b41066d1042126ca235152e2883509d003db
     container_name: sonarr
     environment:
       - PUID=${PUID}
