@@ -24,6 +24,7 @@ services:
       - "traefik.http.routers.navidrome.middlewares=authelia@docker"
     networks:
       - web_proxy
+    # No healthcheck because already present in Dockerfile
 
 networks:
   web_proxy:

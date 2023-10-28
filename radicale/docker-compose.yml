@@ -30,10 +30,7 @@ services:
       - 'traefik.http.routers.radicale.rule=Host("$RADICALE_HOST")'
     networks:
       - web_proxy
-    healthcheck:
-      test: curl -f http://127.0.0.1:5232 || exit 1
-      interval: 30s
-      retries: 3
+    # No healthcheck because already present in Dockerfile
 
 networks:
   web_proxy:

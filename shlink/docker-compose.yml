@@ -61,6 +61,12 @@ services:
       - "traefik.http.services.shlink_client.loadbalancer.server.port=80"
     networks:
       - web_proxy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:80"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   shlink_server:
     image: docker.io/shlinkio/shlink:3.6.4-non-root@sha256:3c6ca9c9aec1ac98fd3ca61250d77e384a824326d4ecde688b1e521d593fc9da
@@ -88,6 +94,12 @@ services:
     networks:
       - web_proxy
       - shlink
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8080/rest/health"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 networks:
   web_proxy:

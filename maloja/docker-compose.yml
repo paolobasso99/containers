@@ -21,6 +21,7 @@ services:
       - "traefik.http.routers.maloja.middlewares=authelia@docker"
     networks:
       - web_proxy
+    # No healthcheck because no public endpoint
 
 networks:
   web_proxy:

@@ -25,6 +25,7 @@ services:
     networks:
       - web_proxy
       - torrent
+    # No healthcheck because already present in Dockerfile
 
 networks:
   web_proxy:

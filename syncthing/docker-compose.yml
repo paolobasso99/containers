@@ -24,6 +24,7 @@ services:
       - "traefik.http.routers.syncthing.middlewares=authelia@docker"
     networks:
       - web_proxy
+    # No healthcheck because no public endpoint
 
 networks:
   web_proxy:

@@ -74,6 +74,12 @@ services:
     networks:
       - immich
       - web_proxy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:3001/server-info/ping"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   immich_microservices:
     image: ghcr.io/immich-app/immich-server:v1.81.1@sha256:6941e59187afd16f4703362f410245ca5e19cdab79c97a7d69224163e020c0a2
@@ -123,6 +129,12 @@ services:
     networks:
       - immich
       - web_proxy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--no-verbose", "--tries", "1", "--spider", "--timeout", "2", "http://localhost:3000"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
   immich_redis:
     image: docker.io/library/redis:7.2.1-alpine@sha256:343e6546f35877801de0b8580274a5e3a8e8464cabe545a2dd9f3c78df77542a

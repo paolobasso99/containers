@@ -24,6 +24,12 @@ services:
     networks:
       - web_proxy
       - torrent
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:6767"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 networks:
   web_proxy:

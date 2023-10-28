@@ -25,6 +25,8 @@ services:
     networks:
       - web_proxy
       - changedetection
+    # No healthcheck because no curl or wget
+
 
   changedetection_playwright:
     container_name: changedetection_playwright
@@ -44,6 +46,12 @@ services:
       - DEFAULT_IGNORE_HTTPS_ERRORS=true
     networks:
       - changedetection
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:3000"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 networks:
   web_proxy:

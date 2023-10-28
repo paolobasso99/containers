@@ -63,6 +63,7 @@ services:
     networks:
       - gotify
       - web_proxy
+    # No healthcheck because already present in Dockerfile
 
 networks:
   web_proxy:

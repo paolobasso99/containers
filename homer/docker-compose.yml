@@ -17,6 +17,7 @@ services:
       - "traefik.http.routers.homer.middlewares=authelia@docker"
     networks:
       - web_proxy
+    # No healthchek because already present in Dockerfile
 
 networks:
   web_proxy:

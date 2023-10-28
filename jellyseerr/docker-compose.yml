@@ -18,6 +18,12 @@ services:
     networks:
       - web_proxy
       - torrent
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--no-verbose", "--tries", "1", "--spider", "--timeout", "2", "http://localhost:5055/api/v1/status"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 networks:
   web_proxy:

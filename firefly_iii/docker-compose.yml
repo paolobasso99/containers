@@ -17,6 +17,12 @@ services:
     restart: unless-stopped
     networks:
       - firefly_iii
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u $${MYSQL_USER} -p$${MYSQL_PASSWORD} -e 'SELECT 1'"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
 
   firefly_iii_db_dumper:
     image: docker.io/paolobasso/database_dumper:mariadb
@@ -75,6 +81,7 @@ services:
     networks:
       - web_proxy
       - firefly_iii
+    # No healthcheck because already present in Dockerfile
 
   firefly_iii_cron:
     image: docker.io/library/alpine:3.18.4@sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
@@ -85,6 +92,12 @@ services:
     command: sh -c "echo \"0 3 * * * wget -qO- http://firefly_iii:8080/api/v1/cron/${FIREFLY_III_STATIC_CRON_TOKEN}\" | crontab - && crond -f -L /dev/stdout"
     networks:
       - firefly_iii
+    healthcheck:
+      test: ["CMD-SHELL", "crontab -l | grep wget"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 networks:
   web_proxy:

@@ -12,6 +12,12 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
     networks:
       - torrent
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8191"]
+      start_period: 20s
+      interval: 30s
+      timeout: 5s
+      retries: 5
 
 networks:
   torrent:
