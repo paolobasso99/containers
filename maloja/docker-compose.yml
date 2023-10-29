@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   maloja:
-    image: docker.io/krateng/maloja:3.1.5@sha256:2f6b746b37828e076988050c653e90b914154cfcd2d97d5ef96046fd66014dd6
+    image: docker.io/krateng/maloja:3.2.0@sha256:a4737846f18128dda09b2d9f5765ed8047c410787e8f7433dea8f46018f0e99a
     container_name: maloja
     user: ${PUID}:${PGID}
     environment:
