@@ -107,7 +107,7 @@ services:
 
   immich_web:
     container_name: immich_web
-    image: ghcr.io/immich-app/immich-web:v1.83.0@sha256:7ac4af26ec224864316cae1cfe0a0d0a2dd2e2cd12f2e8217cc833c490e110f4
+    image: ghcr.io/immich-app/immich-web:v1.85.0@sha256:10778b177594390e1a9ec0d5e80150fb9c6855ff964a7ceb2eded4728abaa821
     depends_on:
       - immich_server
       - immich_redis
