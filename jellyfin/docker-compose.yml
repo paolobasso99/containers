@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   jellyfin:
-    image: docker.io/jellyfin/jellyfin:10.8.11@sha256:d39f8826c0e48b08770b735ab0342c9cb9fc08c59777f41080c76549526fd667
+    image: docker.io/jellyfin/jellyfin:10.8.12@sha256:1be5ae7af68d43d1c1bd6e96e9dc15f57bc1a7340339a0305ac1295d9d752d32
     container_name: jellyfin
     user: ${PUID}:${PGID}
     environment:
