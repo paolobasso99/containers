@@ -3,7 +3,7 @@ version: "3.9"
 services:
   changedetection:
     container_name: changedetection
-    image: ghcr.io/dgtlmoon/changedetection.io:0.45.5@sha256:97b498022973b03876ca1daa950d76a6a3f185fbe371d2cc8a2a0645267f81f7
+    image: ghcr.io/dgtlmoon/changedetection.io:0.45.7@sha256:52b797318e127df59b48c97d88be5d6f4dd6c1bd9d2c1126bcd1897b38e99db2
     restart: unless-stopped
     depends_on:
       changedetection_playwright:
