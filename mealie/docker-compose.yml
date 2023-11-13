@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+  mealie_db:
+    image: docker.io/library/postgres:15.4-alpine@sha256:35ce2187f2f7fb75e8e79493e13743596c21eb3789ff41ece145ae04d06e93a5
+    restart: unless-stopped
+    container_name: mealie_db
+    # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
+    user: "${PUID}:${PGID}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=mealie
+      - POSTGRES_USER=mealie
+      - POSTGRES_PASSWORD=${MEALIE_DB_PASSWORD}
+    networks:
+      - mealie
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+
+  mealie_db_dumper:
+    image: docker.io/paolobasso/database_dumper:postgres-15
+    restart: unless-stopped
+    depends_on:
+      - mealie_db
+    container_name: mealie_db_dumper
+    volumes:
+      - ./db_dumps:/dumps
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DUMPER_DATABASE=mealie
+      - DUMPER_HOST=mealie_db
+      - DUMPER_USER=mealie
+      - DUMPER_PASSWORD=${MEALIE_DB_PASSWORD}
+      - DUMPER_HEALTHCHECKS_URL=${MEALIE_DB_DUMPER_HEALTHCHECKS_URL}
+    networks:
+      - mealie
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1@sha256:fd93062d066e0e69db456c98fcaa027ff866ab6b66b9a250cea36cf40d4a0a91
+    depends_on:
+      - mealie_db
+    restart: unless-stopped
+    container_name: mealie
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - ALLOW_SIGNUP=false
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=https://${MEALIE_HOST}
+      - DB_ENGINE=postgres
+      - POSTGRES_USER=mealie
+      - POSTGRES_PASSWORD=${MEALIE_DB_PASSWORD}
+      - POSTGRES_SERVER=mealie_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=mealie
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.mealie.loadbalancer.server.port=9000"
+      - "traefik.http.routers.mealie.service=mealie"
+      - "traefik.http.routers.mealie.tls=true"
+      - "traefik.http.routers.mealie.entrypoints=websecure"
+      - 'traefik.http.routers.mealie.rule=Host("$MEALIE_HOST")'
+      - "traefik.http.routers.mealie.middlewares=authelia@docker"
+    volumes:
+      - ./data:/app/data
+    networks:
+      - mealie
+      - web_proxy
+    # No healthcheck because already present in Dockerfile
+
+networks:
+  web_proxy:
+    external: true
+  mealie:
+    driver: bridge
