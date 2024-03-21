@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   shlink_db:
-    image: docker.io/library/postgres:15.4-alpine@sha256:35ce2187f2f7fb75e8e79493e13743596c21eb3789ff41ece145ae04d06e93a5
+    image: docker.io/library/postgres:15.6-alpine@sha256:90f25fbf7ea2cf70d6a6a2f9c475c5a297c2b41e15eddaa5d9d8fafc9146072c
     restart: unless-stopped
     container_name: shlink_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
