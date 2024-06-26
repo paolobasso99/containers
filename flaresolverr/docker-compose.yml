@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:v3.3.9@sha256:c6df3628d914eea7b72c5e7ce332d2a8c2b6913df1de02e20cb00ca82ab7c93f
+    image: ghcr.io/flaresolverr/flaresolverr:v3.3.21@sha256:f104ee51e5124d83cf3be9b37480649355d223f7d8f9e453d0d5ef06c6e3b31b
     container_name: flaresolverr
     user: ${PUID}:${PGID}
     environment:
