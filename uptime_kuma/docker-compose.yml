@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   uptime_kuma:
-    image: docker.io/louislam/uptime-kuma:1.23.4-alpine@sha256:43ad2d5792543325d65ec09a1a72353885e286cdf8f22b9d5b95f39ef2bd8db8
+    image: docker.io/louislam/uptime-kuma:1.23.15-alpine@sha256:6aa3bec3f03651e69bf66b1053927d1afbe924326490216b136ff49a769c88be
     container_name: uptime_kuma
     volumes:
       - ./data:/app/data
