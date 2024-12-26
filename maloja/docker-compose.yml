@@ -4,7 +4,7 @@ services:
   maloja:
     image: docker.io/krateng/maloja:3.2.1@sha256:5f73e1735a11bf5b7dd7921931091291f3bf6c2cf6679ae4b5f55d11a979c8db
     container_name: maloja
-    user: ${PUID}:${PGID}
+    #    user: ${PUID}:${PGID}
     environment:
       - MALOJA_DATA_DIRECTORY=/mljdata
       - MALOJA_FORCE_PASSWORD=${MALOJA_FORCE_PASSWORD}
