@@ -34,7 +34,9 @@ services:
       - "traefik.http.routers.healthchecks.middlewares=authelia@docker"
     networks:
       - web_proxy
-    # No healthcheck because no curl or wget
+    # Healthchecks failing
+    healthcheck:
+      disable: true
 
 networks:
   web_proxy:
