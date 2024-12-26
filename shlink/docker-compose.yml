@@ -69,7 +69,7 @@ services:
       retries: 5
 
   shlink_server:
-    image: docker.io/shlinkio/shlink:3.6.4-non-root@sha256:3c6ca9c9aec1ac98fd3ca61250d77e384a824326d4ecde688b1e521d593fc9da
+    image: docker.io/shlinkio/shlink:3.7.4-non-root@sha256:b6553353135346c094e116207fca14fb4d5ce91468e657af92e3e9e730d579e7
     container_name: shlink_server
     depends_on:
       - shlink_db
