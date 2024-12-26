@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   homer:
-    image: docker.io/b4bz/homer:v23.10.1@sha256:f6dcbdd3e9c7d05262128b07aa4138bd4df09837f9a98632111913e9a5eb2283
+    image: docker.io/b4bz/homer:v24.12.1@sha256:4b44a4a9e3294ccef756275271342661c389ae2936e71ac96b911a139de57757
     container_name: homer
     volumes:
       - ./assets:/www/assets
