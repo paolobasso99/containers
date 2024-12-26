@@ -64,7 +64,7 @@ services:
     # No healthcheck because no curl or wget
 
   paperless_ngx_gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.9.2@sha256:2e4fcccf5e065bf4d92b0b69c80776505e602dbfb11618c1c4e4e8be8a0630e9
+    image: docker.io/gotenberg/gotenberg:7.10.2@sha256:d03b8a04c6e6c5e568b38f57352266dee4674849b71818774025f8f48d869a9a
     restart: unless-stopped
     container_name: paperless_ngx_gotenberg
     user: ${PUID}:${PGID}
