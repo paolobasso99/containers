@@ -5,6 +5,7 @@
     "docker:enableMajor",
     "default:automergeDigest"
   ],
+  "ignoreTests": true,
   "packageRules": [
     {
       "matchUpdateTypes": [
