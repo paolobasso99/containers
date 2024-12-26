@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   paperless_ngx_redis:
-    image: docker.io/library/redis:7.2.3-alpine@sha256:5482672695b73780afeddb2ee84d58f393f16f34718d76b246c76afe27465d4c
+    image: docker.io/library/redis:7.4.1-alpine@sha256:c1e88455c85225310bbea54816e9c3f4b5295815e6dbf80c34d40afc6df28275
     container_name: paperless_ngx_redis
     restart: unless-stopped
     networks:
@@ -15,7 +15,7 @@ services:
       timeout: 3s
 
   paperless_ngx_db:
-    image: docker.io/library/postgres:15.4-alpine@sha256:35ce2187f2f7fb75e8e79493e13743596c21eb3789ff41ece145ae04d06e93a5
+    image: docker.io/library/postgres:15.10-alpine@sha256:fd3abc9557df27613bd5c5e6608fc62fb04dc90c8e79c3322348d600e4b75478
     restart: unless-stopped
     container_name: papeless_ngx_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
@@ -55,7 +55,7 @@ services:
       - paperless_ngx
 
   paperless_ngx_tika:
-    image: ghcr.io/paperless-ngx/tika@sha256:652dac3051f6584118cb48e90b3517f6006c2bd0333ae506541fd99995fe56f8
+    image: ghcr.io/paperless-ngx/tika@sha256:20db3df89eaeb1b271dd840888fe909b88b12f4b86ef641ec07a1d45d4c5168f
     container_name: paperless_ngx_tika
     restart: unless-stopped
     user: ${PUID}:${PGID}
@@ -64,7 +64,7 @@ services:
     # No healthcheck because no curl or wget
 
   paperless_ngx_gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.9.2@sha256:2e4fcccf5e065bf4d92b0b69c80776505e602dbfb11618c1c4e4e8be8a0630e9
+    image: docker.io/gotenberg/gotenberg:8.15.2@sha256:ddcbeec3d58ef77391e871e9386deca5e06c816fe651f6cfe96b218c268ef165
     restart: unless-stopped
     container_name: paperless_ngx_gotenberg
     user: ${PUID}:${PGID}

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   immich_db:
-    image: docker.io/library/postgres:15.4-alpine@sha256:35ce2187f2f7fb75e8e79493e13743596c21eb3789ff41ece145ae04d06e93a5
+    image: docker.io/library/postgres:15.10-alpine@sha256:fd3abc9557df27613bd5c5e6608fc62fb04dc90c8e79c3322348d600e4b75478
     restart: unless-stopped
     container_name: immich_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
@@ -42,7 +42,7 @@ services:
       - immich
 
   immich_server:
-    image: ghcr.io/immich-app/immich-server:v1.85.0@sha256:b4c9bc6778a142d9ee1ef61c30a498dc2e84d3aabb50a7d4516d9af346db2743
+    image: ghcr.io/immich-app/immich-server:v1.123.0@sha256:666ce77995230ff7327da5d285c861895576977237de08564e3c3ddf842877eb
     container_name: immich_server
     command: ["start.sh", "immich"]
     depends_on:
@@ -82,7 +82,7 @@ services:
       retries: 5
 
   immich_microservices:
-    image: ghcr.io/immich-app/immich-server:v1.85.0@sha256:b4c9bc6778a142d9ee1ef61c30a498dc2e84d3aabb50a7d4516d9af346db2743
+    image: ghcr.io/immich-app/immich-server:v1.123.0@sha256:666ce77995230ff7327da5d285c861895576977237de08564e3c3ddf842877eb
     container_name: immich_microservices
     command: ["start.sh", "microservices"]
     volumes:
@@ -107,7 +107,7 @@ services:
 
   immich_web:
     container_name: immich_web
-    image: ghcr.io/immich-app/immich-web:v1.85.0@sha256:10778b177594390e1a9ec0d5e80150fb9c6855ff964a7ceb2eded4728abaa821
+    image: ghcr.io/immich-app/immich-web:v1.87.0@sha256:2bef28adbcc60a2ee5dee8cafe109e3d5c6b7bca88d90acdd3eec376200a6d6e
     depends_on:
       - immich_server
       - immich_redis
@@ -137,7 +137,7 @@ services:
       retries: 5
 
   immich_redis:
-    image: docker.io/library/redis:7.2.3-alpine@sha256:5482672695b73780afeddb2ee84d58f393f16f34718d76b246c76afe27465d4c
+    image: docker.io/library/redis:7.4.1-alpine@sha256:c1e88455c85225310bbea54816e9c3f4b5295815e6dbf80c34d40afc6df28275
     container_name: immich_redis
     restart: unless-stopped
     networks:

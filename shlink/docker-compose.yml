@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   shlink_db:
-    image: docker.io/library/postgres:15.4-alpine@sha256:35ce2187f2f7fb75e8e79493e13743596c21eb3789ff41ece145ae04d06e93a5
+    image: docker.io/library/postgres:15.10-alpine@sha256:fd3abc9557df27613bd5c5e6608fc62fb04dc90c8e79c3322348d600e4b75478
     restart: unless-stopped
     container_name: shlink_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
@@ -42,7 +42,7 @@ services:
       - shlink
 
   shlink_client:
-    image: docker.io/shlinkio/shlink-web-client:3.10.2@sha256:b96145d258f69e8c364d82a6a6f7278ddd472ead04b06f09b0d835bb9342e6af
+    image: docker.io/shlinkio/shlink-web-client:4.3.0@sha256:4a84d58508d0a327e6c383a0b57f624dd9a4f1a6e24f3cb538dec18dbaa9f7a1
     container_name: shlink_client
     depends_on:
       - shlink_db
@@ -69,7 +69,7 @@ services:
       retries: 5
 
   shlink_server:
-    image: docker.io/shlinkio/shlink:3.6.4-non-root@sha256:3c6ca9c9aec1ac98fd3ca61250d77e384a824326d4ecde688b1e521d593fc9da
+    image: docker.io/shlinkio/shlink:3.7.4-non-root@sha256:b6553353135346c094e116207fca14fb4d5ce91468e657af92e3e9e730d579e7
     container_name: shlink_server
     depends_on:
       - shlink_db

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   authelia_redis:
-    image: docker.io/library/redis:7.2.3-alpine@sha256:5482672695b73780afeddb2ee84d58f393f16f34718d76b246c76afe27465d4c
+    image: docker.io/library/redis:7.4.1-alpine@sha256:c1e88455c85225310bbea54816e9c3f4b5295815e6dbf80c34d40afc6df28275
     container_name: authelia_redis
     restart: unless-stopped
     networks:
@@ -15,7 +15,7 @@ services:
       timeout: 3s
 
   authelia_db:
-    image: docker.io/library/postgres:15.4-alpine@sha256:35ce2187f2f7fb75e8e79493e13743596c21eb3789ff41ece145ae04d06e93a5
+    image: docker.io/library/postgres:15.10-alpine@sha256:fd3abc9557df27613bd5c5e6608fc62fb04dc90c8e79c3322348d600e4b75478
     restart: unless-stopped
     container_name: authelia_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
@@ -55,7 +55,7 @@ services:
       - authelia
 
   authelia:
-    image: docker.io/authelia/authelia:4.37.5@sha256:25fc5423238b6f3a1fc967fda3f6a9212846aeb4a720327ef61c8ccff52dbbe2
+    image: docker.io/authelia/authelia:4.38.17@sha256:bd0b56ab682ecdf994cc66bbbf75e3ab437a3e4aea4c707eeea0c2fca6cf945e
     depends_on:
       - authelia_redis
       - authelia_db

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   firefly_iii_db:
-    image: docker.io/linuxserver/mariadb:10.11.5@sha256:c34fc2e0ba0f155f4dd69fc75e2e911a60b49f073fa3c432dd2f7d96c85c62ba
+    image: docker.io/linuxserver/mariadb:10.11.10@sha256:27eb81ee62ea1d4ed30069db412fe19b88f7c6555fd0fd81d8be49ab02858e26
     container_name: firefly_iii_db
     environment:
       - PUID=${PUID}
@@ -84,7 +84,7 @@ services:
     # No healthcheck because already present in Dockerfile
 
   firefly_iii_cron:
-    image: docker.io/library/alpine:3.18.4@sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
+    image: docker.io/library/alpine:3.21.0@sha256:21dc6063fd678b478f57c0e13f47560d0ea4eeba26dfc947b2a4f81f686b9f45
     restart: unless-stopped
     depends_on:
       - firefly_iii
