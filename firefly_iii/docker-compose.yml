@@ -84,7 +84,7 @@ services:
     # No healthcheck because already present in Dockerfile
 
   firefly_iii_cron:
-    image: docker.io/library/alpine:3.18.4@sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
+    image: docker.io/library/alpine:3.21.0@sha256:21dc6063fd678b478f57c0e13f47560d0ea4eeba26dfc947b2a4f81f686b9f45
     restart: unless-stopped
     depends_on:
       - firefly_iii
