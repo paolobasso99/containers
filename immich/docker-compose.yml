@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   immich_db:
-    image: docker.io/library/postgres:15.10-alpine@sha256:f85dd74a714c67792c72fc609becff10e0b0eaffca7b40aa1c6251d09c02b5d4
+    image: docker.io/library/postgres:15.10-alpine@sha256:7570f2640b2df707a9b26727e5574a0cadd76928460125f1babc81ec66a35fe4
     restart: unless-stopped
     container_name: immich_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
