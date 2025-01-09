@@ -15,7 +15,7 @@ services:
       timeout: 3s
 
   paperless_ngx_db:
-    image: docker.io/library/postgres:15.10-alpine@sha256:7570f2640b2df707a9b26727e5574a0cadd76928460125f1babc81ec66a35fe4
+    image: docker.io/library/postgres:15.10-alpine@sha256:81ad63b0fb813bbd2752c6722b649c13d6a0ea740db31e35c6e366d163cefb59
     restart: unless-stopped
     container_name: papeless_ngx_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
