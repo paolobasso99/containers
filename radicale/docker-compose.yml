@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   radicale:
-    image: docker.io/tomsquest/docker-radicale:3.3.3.0@sha256:fb8f14916d8940465e52fe0aa1b5d1ea6e58fae545c95c3e5b6ea0d6d48322c7
+    image: docker.io/tomsquest/docker-radicale:3.4.0.0@sha256:d00c83d6f0a16cf035d58cedafcf42f1c637be55387910ce0642f07b921fa01d
     container_name: radicale
     cap_drop:
       - ALL
