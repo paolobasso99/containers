@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   authelia_redis:
-    image: docker.io/library/redis:7.4.2-alpine@sha256:05c26214b0991329c8c68d93294268995f67a034c57d1ddbfbdf76a43de3ddcb
+    image: docker.io/library/redis:7.4.2-alpine@sha256:070d47a7fc389d7cf74257f76bfb57591f470f685eb4637c85f0a587534a4f26
     container_name: authelia_redis
     restart: unless-stopped
     networks:
