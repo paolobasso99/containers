@@ -42,7 +42,7 @@ services:
       - immich
 
   immich_server:
-    image: ghcr.io/immich-app/immich-server:v1.132.0@sha256:b69f91e91ce92e9ed210acfd43e94dd12754c7601e84460394dcc5a322ce10be
+    image: ghcr.io/immich-app/immich-server:v1.132.1@sha256:71cb6d2a6587f6481ae22b1cd743c74f163acbf26ade4df890e4425bb1f2e891
     container_name: immich_server
     command: ["start.sh", "immich"]
     depends_on:
@@ -82,7 +82,7 @@ services:
       retries: 5
 
   immich_microservices:
-    image: ghcr.io/immich-app/immich-server:v1.132.0@sha256:b69f91e91ce92e9ed210acfd43e94dd12754c7601e84460394dcc5a322ce10be
+    image: ghcr.io/immich-app/immich-server:v1.132.1@sha256:71cb6d2a6587f6481ae22b1cd743c74f163acbf26ade4df890e4425bb1f2e891
     container_name: immich_microservices
     command: ["start.sh", "microservices"]
     volumes:
