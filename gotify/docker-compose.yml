@@ -42,7 +42,7 @@ services:
       - gotify
 
   gotify:
-    image: docker.io/gotify/server:2.6.1@sha256:04f4c4bb7cdde8c84e5a89d1287bd1f766c02c1cd477dc01c47acae80bff3c77
+    image: docker.io/gotify/server:2.6.3@sha256:dfbee7fc4701b300936a24b01d24620b4d62e405204c71fd749a63abfb9b4ec4
     depends_on:
       - gotify_db
     restart: unless-stopped
