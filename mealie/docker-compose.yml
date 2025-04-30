@@ -42,7 +42,7 @@ services:
       - mealie
 
   mealie:
-    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1@sha256:fd93062d066e0e69db456c98fcaa027ff866ab6b66b9a250cea36cf40d4a0a91
+    image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1@sha256:6df1e795f17af43f082146e471113315487b5f0882f2ee7553d469034d929af1
     depends_on:
       - mealie_db
     restart: unless-stopped
