@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   syncthing:
-    image: docker.io/linuxserver/syncthing:1.29.5@sha256:01066805eeeb18cb215c62e0f1882345eb30a9791389fb2d6ee98d9cc95b327e
+    image: docker.io/linuxserver/syncthing:1.29.6@sha256:6ba986d886e60ee860356f74fa458d40eaee77b1420ca601273f03deaaf1baf2
     container_name: syncthing
     environment:
       - PUID=${PUID}
