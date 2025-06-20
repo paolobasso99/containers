@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   jellyseerr:
-    image: docker.io/fallenbagel/jellyseerr:2.6.0@sha256:8f320036d937d84c385ea5800f87d69ba16ec4d3770fccf6cad803b5e8d66a52
+    image: docker.io/fallenbagel/jellyseerr:2.7.0@sha256:3ec2ce92445719ea1e610b3e758da20cd317c8e1028fc810d001b1370a339226
     container_name: jellyseerr
     volumes:
       - ./config:/app/config
