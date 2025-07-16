@@ -3,7 +3,7 @@ version: "3.9"
 services:
   traefik:
     container_name: traefik
-    image: docker.io/library/traefik:v2.11.27@sha256:f8deaeb8634ffa77526dbdb920f62820279ebebfa8bfbde8adf459c6c79bc1b3
+    image: docker.io/library/traefik:v2.11.27@sha256:e2516710f22e2aa08638420c603a34726755c005d259456d1655923f921c4a22
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
