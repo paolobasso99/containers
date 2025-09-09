@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   gotify_db:
-    image: docker.io/library/postgres:15.14-alpine@sha256:ffa78a1acb8afef77fbd477d8b2b529bf2acb561637153dcf14a8a47cc8ba67c
+    image: docker.io/library/postgres:15.14-alpine@sha256:dfcf0459185089e88a43197975780f5a3078acd5ece84824a14c9d6fbbab02d0
     restart: unless-stopped
     container_name: gotify_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
