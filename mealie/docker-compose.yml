@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   mealie_db:
-    image: docker.io/library/postgres:15.14-alpine@sha256:3a4cda59817ef228718290e6886e87fb1ad3da44985aea3503d840ecf8a7e302
+    image: docker.io/library/postgres:15.14-alpine@sha256:5e50b90b3b7dd846bc66e5bdf7a9f408ee9a79c3fc4b2f60294f64c310a7df1e
     restart: unless-stopped
     container_name: mealie_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
