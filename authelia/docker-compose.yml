@@ -55,7 +55,7 @@ services:
       - authelia
 
   authelia:
-    image: docker.io/authelia/authelia:4.39.11@sha256:6d64da132463e126b0379909186bc4f631d5ff40eaccb0069ea083e623cb2c87
+    image: docker.io/authelia/authelia:4.39.11@sha256:3190cb21e8709fc4e23db1fd039140f6f1a96365010ffb1ae684fb8ac1302dce
     depends_on:
       - authelia_redis
       - authelia_db
