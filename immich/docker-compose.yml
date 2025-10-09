@@ -137,7 +137,7 @@ services:
       retries: 5
 
   immich_redis:
-    image: docker.io/library/redis:7.4.6-alpine@sha256:7a7c6b5c49a6896d0a58ee0c6dc0dcabe14f30f0a2f7d2d1362d276fa2d43166
+    image: docker.io/library/redis:7.4.6-alpine@sha256:19759b3d20e68cccd22cd7e68bc4884f7e205c5e1c6f3a0291eecee2e653ea54
     container_name: immich_redis
     restart: unless-stopped
     networks:
