@@ -38,7 +38,7 @@ services:
       retries: 5
 
   deluge_proxy:
-    image: docker.io/library/caddy:2.10.2-alpine@sha256:f878dac093277bc6d5ac2baf3068664e4645905da770135b904b25ca85c7707e
+    image: docker.io/library/caddy:2.10.2-alpine@sha256:7d75b1294f73048155757377c38f05621a65c8df4f261077aa3091c9168ea53a
     restart: unless-stopped
     container_name: deluge_proxy
     command: caddy reverse-proxy --from :80 --to deluge:8112
