@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   paperless_ngx_redis:
-    image: docker.io/library/redis:7.4.7-alpine@sha256:e259fd36de6fef21e64a3832483e5fff5d860c7c908121734cda379c9f85e8db
+    image: docker.io/library/redis:7.4.7-alpine@sha256:ee64a64eaab618d88051c3ade8f6352d11531fcf79d9a4818b9b183d8c1d18ba
     container_name: paperless_ngx_redis
     restart: unless-stopped
     networks:
