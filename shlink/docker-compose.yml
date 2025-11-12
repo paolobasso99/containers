@@ -42,7 +42,7 @@ services:
       - shlink
 
   shlink_client:
-    image: docker.io/shlinkio/shlink-web-client:4.5.1@sha256:0e695130f19307dd89c5a2b9b3486106b2445319da88b3af489af162a8f05ee4
+    image: docker.io/shlinkio/shlink-web-client:4.6.0@sha256:b18eac9c37df9d035db661673c5e162819e1a6ddeac0b32a110ea0e8b467acd1
     container_name: shlink_client
     depends_on:
       - shlink_db
