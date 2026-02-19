@@ -15,7 +15,7 @@ services:
       timeout: 3s
 
   authelia_db:
-    image: docker.io/library/postgres:15.16-alpine@sha256:5fe8ca7fc662071188c30271cb870d1ce9a6ec4578c934b064697ae77a9241e1
+    image: docker.io/library/postgres:18.2-alpine@sha256:035b9ab53cfa147d7202b61f5f7782b939ae815b7d6bc81c96b7b42ff1fca950
     restart: unless-stopped
     container_name: authelia_db
     # See: https://github.com/docker-library/docs/blob/master/postgres/README.md#arbitrary---user-notes
