@@ -82,7 +82,7 @@ services:
       - paperless_ngx
 
   paperless_ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.20.7@sha256:7b937cb2fa2885ab0ecfceb8c7e8827e2312472d9d897a270097ba7f5522dcdc
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.20.13@sha256:4b05bcd28e6923768000b5d247cbf2c66fd49bdc3f3b05955bd4f6790a638b01
     container_name: paperless_ngx
     depends_on:
       - paperless_ngx_redis
