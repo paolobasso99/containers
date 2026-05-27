@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   healthchecks:
-    image: docker.io/healthchecks/healthchecks:v3.11.2@sha256:cd8d65cabc30bccf96ed9741f6dcfe1a93521c754cbce7af155560fda3d54526
+    image: docker.io/healthchecks/healthchecks:v4.1.1@sha256:121ba627216f04ef56b6f4c4e1e2028c9ebb8457bd2b6ede797582a80769841d
     container_name: healthchecks
     user: "${PUID}:${PGID}"
     volumes:
