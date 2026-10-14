@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   recyclarr:
-    image: ghcr.io/recyclarr/recyclarr:7.5.2@sha256:2550848d43a453f2c6adf3582f2198ac719f76670691d76de0819053103ef2fb
+    image: ghcr.io/recyclarr/recyclarr:8.8.0@sha256:b1fbb929ba718fdbdac2c1fc25b32b0ae916d7a5a0892c2068c9bfae6f1a9209
     container_name: recyclarr
     user: ${PUID}:${PGID}
     environment:
