@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   multi_scrobbler:
-    image: ghcr.io/foxxmd/multi-scrobbler:0.8.8@sha256:0b1289f28a1d5b66eed45b16d5f8c5b9238a80467dfe6ece72234fcccbd903e7
+    image: ghcr.io/foxxmd/multi-scrobbler:0.21.1@sha256:9e3740476f09a14428eaa97703c7c0e5134469ff1fd5183a10079a192135107f
     container_name: multi_scrobbler
     environment:
       - PUID=${PUID}
