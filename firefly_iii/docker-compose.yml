@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   firefly_iii_db:
-    image: docker.io/linuxserver/mariadb:10.11.10@sha256:118e71fcfca80622241c1d188b1ca0410672149ff1e028b360d51683efeea620
+    image: docker.io/linuxserver/mariadb:11.8.10@sha256:080593de5277bcd9264e0b4e374657a019fdf77e2688996d05269548e0cef3bd
     container_name: firefly_iii_db
     environment:
       - PUID=${PUID}
